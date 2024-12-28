@@ -2,73 +2,51 @@ import os
 import json
 import levelgen
 import logging
+from node import node
+import player 
+import time
+import state
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s'
 )
 
-WIDTH = 10
-HEIGHT = 10
-WAYPOINTS = 3
-
-state = {
-    'route': [{
-        'node': {
-            'label': 'S',
-            'type': 'Jack-In',
-            'location': [0, 0],
-        },
-        'next': {
-            'label': '1',
-            'type': 'Black ICE',
-            'location': [0, 0],
-        },
-        'completed': {
-            'node': False,
-            'path': False,
-        },
-        'path': {
-            "4,8": [
-                "\u2192"
-            ],
-            "5,8": [
-                "\u2192"
-            ],
-        }
-    }]
-}
-
-
-def initialize():
-    global state
-
-    # check if state file exists
-    fn = "state.json"
-    if os.path.exists(fn):
-        logging.info("Loading state from file")
-        with open(fn, "r") as f:
-            state = json.load(f)
-    else:
-        logging.info("Generating new state")
-        route = levelgen.generate_new_state(WIDTH, HEIGHT, WAYPOINTS)
-        state['route'] = route
-
-        with open(fn, "w") as f:
-            json.dump(state, f)
-
 
 def main():
-    initialize()
+    logging.info("Loading game... ")
+    time.sleep(.5)
+    _state = state.MainState()
+    _state.initialize()
+    logging.info("Game ready.")
 
     #print("state", json.dumps(state, indent=4))
     logging.info("Current state: ")
     logging.info("")
-    levelgen.visualize(WIDTH, HEIGHT, state['route'])
+    levelgen.visualize(state.WIDTH, state.HEIGHT, _state._state['route'])
+    print("")
+    logging.info("Player: ")
+    logging.info(json.dumps(_state._state['player'], indent=4))
+    print("")
 
-    # play = True
-    # while (play):
-    #     print("You are at location: " + state['location'])
+    play = True
+    while (play):
+        rloc = levelgen.get_current_route_loc(_state._state['route'])
+        print("You are at location: ", rloc['node']['location'])
+
+        if not rloc['completed']['node']:
+            n = node.generate_node(rloc['node']['type'])
+            n(_state)
+        elif not rloc['completed']['path']:
+            print("You are at a path")
+        else:
+            # should not happen, die
+            logging.error("Invalid state, exiting")
+            exit(1)
+        
+        play = False
+        
+
     #     is_moving = state['location'] == 'S': 
     #     print("Possible moves: " + ", ".join(state['paths'][state['location']]))
     #     print("Enter your move: ")

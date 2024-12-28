@@ -1,7 +1,7 @@
 import random
 import json
 from colorama import Fore, Back, Style, init
-
+import node.node as node
 
 # Initialize colorama
 init()
@@ -35,6 +35,13 @@ def visualize_cell(directions):
         return "↕"  # Conflicting vertical directions
     else:
         return "+"  # General conflict (diagonal or more complex)
+
+
+def get_current_route_loc(route):
+    for r in route:
+        if not r['completed']['node'] or not r['completed']['path']:
+            return r
+    return None
 
 
 def visualize(width, height, route):
@@ -76,7 +83,7 @@ def visualize(width, height, route):
     for r in route:
         if r['completed']['node'] and r['completed']['path']:
             continue
-        
+
         dobreak = False
         if not r['completed']['node'] or not r['completed']['path']:
             dobreak = True
@@ -132,10 +139,10 @@ def generate_new_state(width, height, waypoints_number):
         'type': 'Jack-In', 
         'location': get_random_position(width, height),
     }
-    end_node_types = ['Data Fortresses', 'Mainframe', 'Data Core']
+    
     end = {
         'label': 'E',
-        'type': random.choice(end_node_types),
+        'type': random.choice(node.end_node_types),
         'location': None
     }
     while near(start, end):
@@ -143,21 +150,12 @@ def generate_new_state(width, height, waypoints_number):
 
     #print("start", start, "end", end)
 
-    node_types = [
-        'Black ICE', # ICE = Intrusion Countermeasures Electronics
-        'White ICE', 
-        'Firewall', 
-        'Competing Netrunner', 
-        'Trace Program', 
-        'Signal Interference',
-    ]
-
     # generate nodes
     nodes = []
     for i in range(waypoints_number):
         wp = {
             'label': str(i),
-            'type': random.choice(node_types),
+            'type': random.choice(node.node_types),
             'location': get_random_position(width, height)
         }
         while near_any(nodes, wp) or near(start, wp) or near(end, wp):
