@@ -74,6 +74,9 @@ def visualize(width, height, route):
     # visualize progress with different color
     leg = set()
     for r in route:
+        if r['completed']['node'] and r['completed']['path']:
+            continue
+        
         dobreak = False
         if not r['completed']['node'] or not r['completed']['path']:
             dobreak = True
