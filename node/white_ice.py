@@ -59,55 +59,136 @@ white_ice_programs = [
   ]
 
 def netwatch_scout_action(_state):
-    print("The Netwatch Scout detects your intrusion and raises an alarm.")
-    print("Black ICE programs are summoned to your location.")
-    print("You must deal with the incoming threat.")
+    print("The Netwatch Scout tries to detect your intrusion.")
+    print("Roll a 1d6 to determine the outcome. On 5 and 6 you are detected.")
+    print("Press any key to continue.")
+    input()
     print("")
-    black_ice.black_ice(_state)
+    roll = random.randint(1, 6)
+    print("You rolled a " + str(roll) + ".")
+    print("")
+    if roll > 4:
+      print("The Netwatch Scout detects your intrusion and raises an alarm.")
+      print("Black ICE programs are summoned to your location.")
+      print("Press any key to continue.")
+      input()
+      print("")
+      black_ice.black_ice(_state)
+    else:
+      print("The Netwatch Scout fails to detect your intrusion.")
+      print("You proceed further in your mission.")
+      _state.complete_node()
+      print("Press any key to continue.")
+      input()
 
 def gatekeeper_action(_state):
     print("The Gatekeeper program imposes additional checks and encryption layers.")
     print("You must navigate through the additional security measures.")
-    print("")
-    print("The Gatekeeper program slows down your actions.")
-    print("You must spend additional time to complete your tasks.")
-    print("You are slowed down by 1d6 turns.")
+    print("Roll a 1d6. If you roll 6 you are slowed down.")
+    print("Press any key to continue.")
+    input()
     print("")
     roll = random.randint(1, 6)
-    _state.slow_down(roll)
-    print("")
+    print("You rolled a " + str(roll) + ".")
+
+    if roll == 6:
+        print("The Gatekeeper program slows down your actions.")
+        print("You must spend additional time to complete your tasks.")
+        print("You are slowed down by 1d6 turns.")
+        print("")
+        roll = random.randint(1, 6)
+        print("You are slowed down by " + str(roll) + " turns but you complete the node.")
+        _state.slow_down(roll)
+        _state.complete_node()
+        print("Press any key to continue.")
+        input()
+    else:
+        print("The Gatekeeper program does not slow you down.")
+        print("You proceed further in your mission.")
+        _state.complete_node()
+        print("Press any key to continue.")
+        input()
 
 def watchdog_action(_state):
     print("The Watchdog program tracks your actions and monitors your intrusion attempt.")
-    print("It does not immediately attack, but it assists other ICE programs.")
-    print("Your actions are being monitored.")
-    _state.watch_dogged()
+    print("Roll a 1d6 to determine the outcome. On 6 the watchdog catches your scent and follows you around, jumping to assist any Black ICE programs you may encounter.")
+    print("Press any key to continue.")
+    input()
     print("")
+    roll = random.randint(1, 6)
+    print("You rolled a " + str(roll) + ".")
+    print("")
+    if roll == 6:
+        print("The Watchdog program catches your scent and follows you around.")
+        print("It jumps to assist any Black ICE programs you may encounter.")
+        _state.watch_dogged()
+        print("You have passed this node.")
+        print("Press any key to continue.")
+        input()
+    else:
+        print("The Watchdog program fails to catch your scent.")
+        print("You proceed further in your mission.")
+        _state.complete_node()
+        print("Press any key to continue.")
+        input()
 
 def warden_action(_state):
     print("The Warden program locks down specific parts of the system to prevent further intrusion.")
-    print("You must deal with the locked nodes and barriers.")
+    print("Roll a 1d6 to determine the outcome. On 6 you must deal with the locked nodes and barriers.")
+    print("Press any key to continue.")
+    input()
     print("")
-    print("The Warden program creates barriers and locked nodes.")
-    print("You must find a way to bypass or unlock them.")
-    print("")
-
     roll = random.randint(1, 6)
-    _state.slow_down(roll)
+    print("You rolled a " + str(roll) + ".")
+    print("")
+    if roll == 6:
+        print("The Warden program locks down specific parts of the system.")
+        print("You are slowed down by 1d6 turns.")
+        print("")
+        roll = random.randint(1, 6)
+        print("You are slowed down by " + str(roll) + " turns but you complete the node.")
+        _state.slow_down(roll)
+        _state.complete_node()
+        print("Press any key to continue.")
+        input()
+    else: 
+        print("The Warden program does not lock down the system.")
+        print("You proceed further in your mission.")
+        _state.complete_node()
+        print("Press any key to continue.")
+        input()
 
 def logger_action(_state):
     print("The Logger program records all actions within the system.")
-    print("Your intrusion attempt is logged and stored for post-intrusion analysis.")
-    print("Your actions are now under scrutiny by the system defenders.")
-    
-    _state.logged()
+    print("Your intrusion attempts are logged and stored for post-intrusion analysis.")
+    print("Roll a 1d6 to determine the outcome. On 5 and 6 you are logged.")
+    print("Press any key to continue.")
+    input()
+    roll = random.randint(1, 6)
+    print("You rolled a " + str(roll) + ".")
+    print("")
+    if roll > 4:
+        print("The Logger program logs your intrusion attempts.")
+        print("Your actions are now under scrutiny by the system defenders.")
+        print("You have cleared this node.")
+        _state.logged()
+        _state.complete_node()
+        print("Press any key to continue.")
+        input()
+    else:
+        print("The Logger program fails to log your intrusion attempts.")
+        print("You proceed further in your mission.")
+        _state.complete_node()
+        print("Press any key to continue.")
+        input()
+
 
 def tracer_action(_state):
     print("The Tracer program attempts to locate your physical location.")
     print("You must evade the tracking attempt.")
     print("")
     print("You have a chance to avoid detection.")
-    print("Roll a 1d6 to determine the outcome.")
+    print("Roll a 1d6 to determine the outcome. On 4, 5, and 6 you successfully evade the Tracer program.")
     print("")
 
     roll = random.randint(1, 6)
@@ -115,17 +196,17 @@ def tracer_action(_state):
 
     if roll > 3:
         print("You successfully evade the Tracer program.")
+        _state.complete_node()
+        print("Press any key to continue.")
+        input()
     else:
         print("The Tracer program successfully locates your physical location.")
-        print("You must deal with the consequences.")
+        print("You must deal with the consequences in the physical world. But for now you have cleared this node and can continue with your mission.")
         print("")
-
-        print("The Tracer program has alerted the system defenders to your location.")
-        print(" ---- TODO: This should do something different ---- ")
-        print("Black ICE programs are summoned to your location.")
-        print("You must deal with the incoming threat.")
-        print("")
-        black_ice.black_ice(_state)
+        _state.logged()
+        _state.complete_node()
+        print("Press any key to continue.")
+        input()
 
 
 ## main function

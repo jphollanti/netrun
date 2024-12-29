@@ -10,7 +10,7 @@ WAYPOINTS = 3
 # state template
 state = {
     'player': {
-        'health': 10,
+        'health': 50,
         'deck': [
             ''
         ],
@@ -115,6 +115,15 @@ class MainState:
     
     def watch_dogged(self):
         print("Watch dogged")
+    
+    def tracered(self):
+        print("Tracered")
+    
+    def destroy_programs(self):
+        self._state['player']['deck'] = []
+        self.store()
+        print("Programs destroyed")
+
 
 
 def get_sections_of_path(path):
