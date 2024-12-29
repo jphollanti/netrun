@@ -12,3 +12,7 @@ def competing_netrunner(_state):
         print("The netrunner is hostile and attempts to hack you.")
         print("You must deal with the threat.")
         print("TBD: Implement competing netrunner actions.")
+        print("Press any key to continue.")
+        input()
+        print("You have dealt with the threat.")
+        _state.complete_node()
