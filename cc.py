@@ -1,7 +1,15 @@
 import random
-
+import copy
 # Define a symbol for highlighting patterns
 HIGHLIGHT_SYMBOL = "*"
+
+ALL_SYMBOLS = {
+    "A": {"color": "red"},
+    "B": {"color": "blue"},
+    "C": {"color": "green"},
+    "D": {"color": "yellow"},
+    "E": {"color": "purple"},
+}
 
 # Initialize the board with random pieces
 def initialize_board(rows, cols, pieces, all_symbols, wander):
@@ -53,7 +61,7 @@ def initialize_board(rows, cols, pieces, all_symbols, wander):
                 r = r + 1
                 board[r][c] = piece
                 piece_locs[piece["symbol"]].append((r, c))
-                print("filling ", piece['symbol'], " r", r, "c", c)
+                # print("filling ", piece['symbol'], " r", r, "c", c)
                 # fill taken indices so we don't overlap pieces
                 fill_taken_indices(r, c)
         else:
@@ -67,15 +75,13 @@ def initialize_board(rows, cols, pieces, all_symbols, wander):
                 c = c + 1
                 board[r][c] = piece
                 piece_locs[piece["symbol"]].append((r, c))
-                print("filling ", piece['symbol'], " r", r, "c", c)
+                #print("filling ", piece['symbol'], " r", r, "c", c)
                 # fill taken indices so we don't overlap pieces
                 fill_taken_indices(r, c)
     
     # print original board
-    print("Original board")
-    print_board(board)
-    
-    return do_wander(board, pieces, piece_locs, wander)
+    original_board = copy.deepcopy(board)
+    return [original_board, do_wander(board, pieces, piece_locs, wander)]
 
 
 def do_wander(board, pieces, piece_locs, wander):
@@ -389,6 +395,36 @@ def prompt_and_swap(board):
         print(" ".join(row))
 
 
+def play_game(width, height, pieces, wander):
+    original_board, board = initialize_board(width, height, pieces, ALL_SYMBOLS, wander)
+    print("Initial Board:")
+    print_board(original_board)
+
+    print("Board to solve:")
+    print_board(board)
+
+    while wander > 0:
+        print(f"Moves left: {wander}")
+        # Pick two cells to swap
+        prompt_and_swap(board)
+
+        highlights = find_patterns(board, pieces)
+        print("Board with Highlighted Patterns:")
+        print_board(board, highlights)
+
+        wander -= 1
+    
+        highlights, found = find_patterns(board, pieces)
+        # check if highlights equals pieces
+        #print("highlights", highlights, "found", found, "pieces", len(pieces), "pieces", pieces)
+        if found == len(pieces):
+            print("You won!")
+            return True
+    
+    print("You lost!")
+    return False
+
+
 # Main game logic
 def main():
 
@@ -402,42 +438,10 @@ def main():
         {"symbol": "B", "length": 4},
     ]
 
-    all_symbols = {
-        "A": {"color": "red"},
-        "B": {"color": "blue"},
-        "C": {"color": "green"},
-        "D": {"color": "yellow"},
-        "E": {"color": "purple"},
-    }
-
     wander = 4
 
-    board = initialize_board(rows, cols, pieces, all_symbols, wander)
-    print("Initial Board:")
-    print_board(board)
+    play_game(rows, cols, pieces, wander)
 
-    highlights = find_patterns(board, pieces)
-    print("Board with Highlighted Patterns:")
-    print_board(board, highlights)
-
-    while wander > 0:
-        print(f"Moves left: {wander}")
-        # Pick two random cells to swap
-        prompt_and_swap(board)
-
-        highlights = find_patterns(board, pieces)
-        print("Board with Highlighted Patterns:")
-        print_board(board, highlights)
-
-        wander -= 1
-    
-    highlights, found = find_patterns(board, pieces)
-    # check if highlights equals pieces
-    print("highlights", highlights, "found", found, "pieces", len(pieces), "pieces", pieces)
-    if found == len(pieces):
-        print("You won!")
-    else:
-        print("You lost!")
 
 if __name__ == "__main__":
     main()

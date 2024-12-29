@@ -30,14 +30,38 @@ state = {
             'node': False,
             'path': False,
         },
-        'path': {
-            "4,8": [
-                "\u2192"
-            ],
-            "5,8": [
-                "\u2192"
-            ],
-        }
+        'path': [
+            {
+                "location": [
+                    3,
+                    8
+                ],
+                "direction": [
+                    -1,
+                    0
+                ]
+            },
+            {
+                "location": [
+                    2,
+                    8
+                ],
+                "direction": [
+                    0,
+                    -1
+                ]
+            },
+            {
+                "location": [
+                    2,
+                    7
+                ],
+                "direction": [
+                    0,
+                    -1
+                ]
+            }
+        ]
     }]
 }
 
@@ -82,3 +106,36 @@ class MainState:
         rloc = levelgen.get_current_route_loc(self._state['route'])
         rloc['completed']['path'] = True
         self.store()
+    
+    def logged(self):
+        print("Actions are being logged")
+    
+    def slow_down(self, roll):
+        print("Slowed down")
+    
+    def watch_dogged(self):
+        print("Watch dogged")
+
+
+def get_sections_of_path(path):
+    """
+    Since paths are always at max a set of two blocks, get from path length two continuous sections of the path
+    """
+    sections = []
+    direction = None
+    count = 0
+    for step in path:
+        if direction is None:
+            direction = step['direction']
+            count = 1
+        elif step['direction'] == direction:
+            count += 1
+        elif step['direction'] != direction:
+            sections.append(count)
+            direction = step['direction']
+            count = 0
+    
+    if count > 0:
+        sections.append(count)
+    
+    return sections

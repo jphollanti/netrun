@@ -111,8 +111,16 @@ def visualize(width, height, route):
             break
     #print(leg)
 
+    # Print a header with column indices
+    print("   ", end="")  # Some spacing before column indices
+    for c in range(width):
+        print(c, end=" ")
+    print()  # Move to next line
+
     # visualize start, end, waypoints and paths
     for y in range(height):
+        print(f"{y:<3}", end="")  # Print row index (left-aligned with width 3)
+
         for x in range(width):
             key = str(x) + "," + str(y)
             
@@ -125,11 +133,11 @@ def visualize(width, height, route):
             
             if key in nodes:
                 node = nodes[key]
-                print(node['label'], end="")
+                print(node['label'], end=" ")
             elif key in paths:
-                print(visualize_cell(paths[key]), end="")
+                print(visualize_cell(paths[key]), end=" ")
             else:
-                print(".", end="")
+                print(".", end=" ")
         print()
 
 
