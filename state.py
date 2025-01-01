@@ -2,6 +2,7 @@ import os
 import levelgen
 import json
 import player 
+from cool_print import cool_print
 
 WIDTH = 10
 HEIGHT = 10
@@ -79,11 +80,11 @@ class MainState:
         # check if state file exists
         fn = "state.json"
         if os.path.exists(fn):
-            print("Loading existing game")
+            cool_print("Loading existing game")
             with open(fn, "r") as f:
                 self._state = json.load(f)
         else:
-            print("Creating new game")
+            cool_print("Creating new game")
             route = levelgen.generate_new_state(WIDTH, HEIGHT, WAYPOINTS)
             _player = player.new_player()
             self._state = {
@@ -108,21 +109,21 @@ class MainState:
         self.store()
     
     def logged(self):
-        print("Actions are being logged")
+        cool_print("Actions are being logged")
     
     def slow_down(self, roll):
-        print("Slowed down")
+        cool_print("Slowed down")
     
     def watch_dogged(self):
-        print("Watch dogged")
+        cool_print("Watch dogged")
     
     def tracered(self):
-        print("Tracered")
+        cool_print("Tracered")
     
     def destroy_programs(self):
         self._state['player']['deck'] = []
         self.store()
-        print("Programs destroyed")
+        cool_print("Programs destroyed")
 
 
 

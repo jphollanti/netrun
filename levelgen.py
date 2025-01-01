@@ -2,6 +2,7 @@ import random
 import json
 from colorama import Fore, Back, Style, init
 import node.node as node
+from cool_print import cool_print
 
 # Initialize colorama
 init()
@@ -44,7 +45,7 @@ def get_current_route_loc(route):
     return None
 
 
-def visualize(width, height, route):
+def visualize(width, height, route, current_loc):
 
     #print(json.dumps(route, indent=4))  
     paths = {}
@@ -109,36 +110,37 @@ def visualize(width, height, route):
         
         if dobreak:
             break
-    #print(leg)
+    
+    current_loc_key = str(current_loc[0]) + "," + str(current_loc[1])
 
     # Print a header with column indices
-    print("   ", end="")  # Some spacing before column indices
+    txt = "   "
     for c in range(width):
-        print(c, end=" ")
-    print()  # Move to next line
+        txt += str(c) + " "
+    cool_print(txt)
 
     # visualize start, end, waypoints and paths
     for y in range(height):
-        print(f"{y:<3}", end="")  # Print row index (left-aligned with width 3)
+        txt = f"{y:<3}"
 
+        color_map = {}
         for x in range(width):
             key = str(x) + "," + str(y)
+            text_x = 3 + 2 * x
             
             if key in leg:
-                color = Fore.GREEN
-            else: 
-                color = Style.RESET_ALL + "\033[39m"
-            
-            print(color, end="")
-            
+                color_map[text_x] = Fore.YELLOW
             if key in nodes:
                 node = nodes[key]
-                print(node['label'], end=" ")
+                txt += node['label'] + " "
+            if key == current_loc_key:
+                color_map[text_x] = Fore.RED
             elif key in paths:
-                print(visualize_cell(paths[key]), end=" ")
+                txt += visualize_cell(paths[key]) + " "
             else:
-                print(".", end=" ")
-        print()
+                txt += ". "
+        # print(color_map)
+        cool_print(txt, color_map=color_map)
 
 
 def generate_new_state(width, height, waypoints_number):

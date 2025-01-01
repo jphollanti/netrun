@@ -1,5 +1,7 @@
 import random
 import copy
+from cool_print import cool_print
+
 # Define a symbol for highlighting patterns
 HIGHLIGHT_SYMBOL = "*"
 
@@ -209,101 +211,27 @@ def do_wander(board, pieces, piece_locs, wander):
 
     return board
 
-
-# def do_wander2(board, pieces, piece_locs, wander):
-#     """
-#     Break the current indices of piece_locs, make them wander around the board
-#     in random directions (one tile at a time), ensuring that:
-#       1. No symbol goes off the board.
-#       2. No symbol overlaps another.
-#       3. A cell does not immediately reverse its last move.
-      
-#     :param board: 2D list (board[y][x]) of size [height][width].
-#     :param pieces: List of dicts, e.g. [{"symbol": "A", "length": 2}, ...].
-#     :param piece_locs: Dict { symbol: [(x1,y1), (x2,y2), ...], ... }.
-#     :param wander: Integer number of single-cell random moves to perform overall.
-#     :return: Modified board (2D list) with the symbols after wandering.
-#     """
-#     # 1) Flatten all piece positions: [("A", (x1, y1)), ("B", (x2, y2)), ...]
-#     all_coords = []
-#     for symbol, coords in piece_locs.items():
-#         for (x, y) in coords:
-#             all_coords.append((symbol, (x, y)))
-
-#     # 2) Clear the board so we can re-place symbols after wandering
-#     height = len(board)
-#     width  = len(board[0]) if height > 0 else 0
-#     for row in range(height):
-#         for col in range(width):
-#             board[row][col] = "."
-
-#     # 3) Keep track of which cells are occupied to prevent overlap
-#     occupied_positions = set((x, y) for _, (x, y) in all_coords)
-
-#     # 4) Possible single-step directions
-#     directions = [(0, 1),   # down
-#                   (0, -1),  # up
-#                   (1, 0),   # right
-#                   (-1, 0)]  # left
-    
-#     # 5) Track each cell's last direction; None means no previous move
-#     last_moves = [None] * len(all_coords)
-
-#     # 6) Perform `wander` moves in total
-#     for _ in range(wander):
-#         # Pick one random cell to try to move
-#         i = random.randrange(len(all_coords))
-#         symbol, (x, y) = all_coords[i]
-#         last_dir = last_moves[i]  # e.g. (dx, dy) or None
-
-#         # Shuffle the directions to pick a random valid one
-#         random.shuffle(directions)
-
-#         for dx, dy in directions:
-#             # Skip if this direction is the exact opposite of the last move
-#             # e.g. last_dir = (1, 0) => skip (-1, 0)
-#             if last_dir is not None and (dx, dy) == (-last_dir[0], -last_dir[1]):
-#                 continue
-
-#             nx, ny = x + dx, y + dy
-#             # Check bounds and occupancy
-#             if 0 <= nx < width and 0 <= ny < height and (nx, ny) not in occupied_positions:
-#                 # Valid move: update everything
-#                 occupied_positions.remove((x, y))   # old position now free
-#                 occupied_positions.add((nx, ny))    # new position is occupied
-#                 all_coords[i] = (symbol, (nx, ny))  # update cell location
-#                 last_moves[i] = (dx, dy)            # remember which way we moved
-#                 break
-#         # If no direction was valid, the cell doesn't move this turn.
-
-#     # 7) Place the symbols at their final positions on the board
-#     for symbol, (x, y) in all_coords:
-#         board[y][x] = symbol
-
-#     return board
-
 # Print the board to the console
 def print_board(board, highlights=None):
     # Print a header with column indices
-    print("   ", end="")  # Some spacing before column indices
+    txt = "   "
     for c in range(len(board[0])):
-        print(c, end=" ")
-    print()  # Move to next line
-
+        txt += str(c) + " "
+    cool_print(txt)
+    
     # Print each row with its index
     for r in range(len(board)):
-        print(f"{r:<3}", end="")  # Print row index (left-aligned with width 3)
+        txt = f"{r:<3}" # Print row index (left-aligned with width 3)
         for c in range(len(board[0])):
             if highlights and (r, c) in highlights:
-                print(HIGHLIGHT_SYMBOL, end=" ")
+                txt += HIGHLIGHT_SYMBOL + " "
             else:
                 cell = board[r][c]
                 if isinstance(cell, dict):
-                    print(cell['symbol'], end=" ")
+                    txt += cell['symbol'] + " "
                 else:
-                    print(cell, end=" ")
-        print()
-    print()
+                    txt += cell + " "
+        cool_print(txt)
 
 # Find patterns based on the rules
 def find_patterns(board, pieces):
@@ -364,7 +292,7 @@ def swap_cells(board, pos1, pos2):
 
     # Check adjacency (Manhattan distance == 1)
     if abs(x2 - x1) + abs(y2 - y1) != 1:
-        print("Cells are not adjacent; swap canceled.")
+        cool_print("Cells are not adjacent; swap canceled.")
         return
 
     # Swap the two cells on the board
@@ -396,20 +324,20 @@ def prompt_and_swap(board):
 
 
 def play_game(width, height, pieces, wander):
-    original_board, board = initialize_board(width, height, pieces, ALL_SYMBOLS, wander)
-    print("Initial Board:")
-    print_board(original_board)
+    _, board = initialize_board(width, height, pieces, ALL_SYMBOLS, wander)
+    #print("Initial Board:")
+    #print_board(original_board)
 
-    print("Board to solve:")
+    cool_print("Board to solve:")
     print_board(board)
 
     while wander > 0:
-        print(f"Moves left: {wander}")
+        cool_print(f"Moves left: {wander}")
         # Pick two cells to swap
         prompt_and_swap(board)
 
         highlights = find_patterns(board, pieces)
-        print("Board with Highlighted Patterns:")
+        cool_print("Board with Highlighted Patterns:")
         print_board(board, highlights)
 
         wander -= 1
@@ -418,10 +346,10 @@ def play_game(width, height, pieces, wander):
         # check if highlights equals pieces
         #print("highlights", highlights, "found", found, "pieces", len(pieces), "pieces", pieces)
         if found == len(pieces):
-            print("You won!")
+            cool_print("You won!")
             return True
     
-    print("You lost!")
+    cool_print("You lost!")
     return False
 
 

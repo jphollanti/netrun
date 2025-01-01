@@ -1,50 +1,40 @@
-import os
 import json
 import levelgen
 import logging
 from node import node
-import player 
 import time
 import state
 import cc
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s'
-)
-
+from cool_print import cool_print
+from colorama import Fore, Back, Style, init
 
 def main():
-    logging.info("Loading game... ")
-    time.sleep(.5)
     _state = state.MainState()
     _state.initialize()
-    logging.info("Game ready.")
-
-    #print("state", json.dumps(state, indent=4))
-    logging.info("Current state: ")
-    logging.info("")
-    levelgen.visualize(state.WIDTH, state.HEIGHT, _state._state['route'])
-    print("")
-    logging.info("Player: ")
-    logging.info(json.dumps(_state._state['player'], indent=4))
-    print("")
-
+    cool_print("")
     play = True
     while (play):
         rloc = levelgen.get_current_route_loc(_state._state['route'])
-        print("You are at location: ", rloc['node']['location'])
+        cool_print("Progress: ")
+        print("")
+        levelgen.visualize(state.WIDTH, state.HEIGHT, _state._state['route'], rloc['node']['location'])
+        cool_print("You are at location: ", rloc['node']['location'])
 
         if not rloc['completed']['node']:
             n = node.generate_node(rloc['node']['type'])
             n(_state)
         elif not rloc['completed']['path']:
-            print("You are at a path and you must choose to cross it or to escape.")
+            cool_print("You are at a path and you must choose to cross it or to escape.")
+            color_map = {}
+            txt = "Enter 'c' to cross the path or 'e' to escape: "
+            for i in range(len(txt)):
+                color_map[i] = Fore.YELLOW
+            cool_print("Enter 'c' to cross the path or 'e' to escape: ", color_map=color_map)
 
-            choice = input("Enter 'c' to cross the path or 'e' to escape: ")
+            choice = input()
 
             if choice == 'e':
-                print("You escaped the challenge and live to see another day.")
+                cool_print("You escaped the challenge and live to see another day.")
                 play = False
             elif choice == 'c':
                 # get from path length of two continuous sections of the path
@@ -68,16 +58,16 @@ def main():
                 
                 wander = 4
 
-                print("To cross the path you must align the symbols on the following table in such a way:")
-                print("")
+                cool_print("To cross the path you must align the symbols on the following table in such a way:")
+                cool_print("")
                 for p in pieces:
                     example = p['symbol'] * p['length']
-                    print(p['symbol'] + ": " + str(p['length']) + " (example: " + example + ")")
+                    cool_print(p['symbol'] + ": " + str(p['length']) + " (example: " + example + ")")
 
                 if cc.play_game(width, height, pieces, wander):
                     _state.complete_path()
                 else:
-                    logging.info("You dead, try again")
+                    cool_print("You dead, try again")
                     play = False
         else:
             # should not happen, die
@@ -86,15 +76,15 @@ def main():
         
 
     #     is_moving = state['location'] == 'S': 
-    #     print("Possible moves: " + ", ".join(state['paths'][state['location']]))
-    #     print("Enter your move: ")
+    #     cool_print("Possible moves: " + ", ".join(state['paths'][state['location']]))
+    #     cool_print("Enter your move: ")
     #     move = input()
     #     if move == "exit":
     #         play = False
     #     elif move in state['paths']:
     #         state['location'] = move
     #     else:
-    #         logging.info("Invalid move, try again")
+    #         cool_print("Invalid move, try again")
 
 
 
