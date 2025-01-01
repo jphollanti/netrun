@@ -47,7 +47,7 @@ def generate_bell_curve_delay(lower: float, upper: float, z: int = 2, max_attemp
     mu = (lower + upper) / 2
     sigma = (upper - lower) / (2 * z)
 
-    for attempt in range(max_attempts):
+    for _ in range(max_attempts):
         delay = random.gauss(mu, sigma)
         if lower <= delay <= upper:
             return delay
