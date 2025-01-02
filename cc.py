@@ -217,7 +217,7 @@ def print_board(board, highlights=None):
     txt = "   "
     for c in range(len(board[0])):
         txt += str(c) + " "
-    cool_print(txt)
+    cool_print(txt, upper_delay=.15, placeholder_upper_delay=.015)
     
     # Print each row with its index
     for r in range(len(board)):
@@ -231,7 +231,7 @@ def print_board(board, highlights=None):
                     txt += cell['symbol'] + " "
                 else:
                     txt += cell + " "
-        cool_print(txt)
+        cool_print(txt, upper_delay=.15, placeholder_upper_delay=.015)
 
 # Find patterns based on the rules
 def find_patterns(board, pieces):
@@ -305,12 +305,14 @@ def prompt_and_swap(board):
     then call swap_cells to swap those positions on the board.
     """
     # 1) Prompt user for the first cell (x1, y1)
-    inp = input("Enter coordinates of the first cell (x1 y1): ")
+    cool_print("Enter coordinates of the first cell (x1 y1):")
+    inp = input()
     x1_str, y1_str = inp.split()
     x1, y1 = int(x1_str), int(y1_str)
 
     # 2) Prompt user for the second cell (x2, y2)
-    inp = input("Enter coordinates of the second cell (x2 y2): ")
+    cool_print("Enter coordinates of the second cell (x2 y2):")
+    inp = input()
     x2_str, y2_str = inp.split()
     x2, y2 = int(x2_str), int(y2_str)
 
@@ -318,9 +320,9 @@ def prompt_and_swap(board):
     swap_cells(board, (x1, y1), (x2, y2))
 
     # 4) Optionally, print the board or do some other feedback
-    print("Swap attempted. Current board:")
+    cool_print("Swap attempted. Current board:")
     for row in board:
-        print(" ".join(row))
+        cool_print(" ".join(row))
 
 
 def play_game(width, height, pieces, wander):

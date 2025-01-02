@@ -117,7 +117,7 @@ def visualize(width, height, route, current_loc):
     txt = "   "
     for c in range(width):
         txt += str(c) + " "
-    cool_print(txt)
+    cool_print(txt, upper_delay=.15, placeholder_lower_delay=.005, placeholder_upper_delay=.01)
 
     # visualize start, end, waypoints and paths
     for y in range(height):
@@ -130,17 +130,18 @@ def visualize(width, height, route, current_loc):
             
             if key in leg:
                 color_map[text_x] = Fore.YELLOW
+            if key == current_loc_key:
+                color_map[text_x] = Fore.RED
             if key in nodes:
                 node = nodes[key]
                 txt += node['label'] + " "
-            if key == current_loc_key:
-                color_map[text_x] = Fore.RED
             elif key in paths:
                 txt += visualize_cell(paths[key]) + " "
             else:
                 txt += ". "
         # print(color_map)
-        cool_print(txt, color_map=color_map)
+        mdel = y * .003
+        cool_print(txt, color_map=color_map, lower_delay=.1-mdel, upper_delay=.15-mdel, placeholder_lower_delay=.005-mdel, placeholder_upper_delay=.01-mdel)
 
 
 def generate_new_state(width, height, waypoints_number):

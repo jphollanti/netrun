@@ -71,21 +71,10 @@ def main():
                     play = False
         else:
             # should not happen, die
+            logging.error("-----------------")
             logging.error("Invalid state, exiting")
+            logging.error("-----------------")
             exit(1)
-        
-
-    #     is_moving = state['location'] == 'S': 
-    #     cool_print("Possible moves: " + ", ".join(state['paths'][state['location']]))
-    #     cool_print("Enter your move: ")
-    #     move = input()
-    #     if move == "exit":
-    #         play = False
-    #     elif move in state['paths']:
-    #         state['location'] = move
-    #     else:
-    #         cool_print("Invalid move, try again")
-
 
 
 if __name__ == "__main__":

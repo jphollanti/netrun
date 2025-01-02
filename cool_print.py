@@ -61,8 +61,10 @@ def cool_print(
     end: str = '\n',
     file: Any = sys.stdout,
     flush: bool = False,
-    lower_delay: float = 0.01,
-    upper_delay: float = 0.05,
+    lower_delay: float = 0.1,
+    upper_delay: float = 0.3,
+    placeholder_lower_delay: float = 0.01,
+    placeholder_upper_delay: float = 0.02,
     z: int = 2,
     color_map: Optional[Dict[int, str]] = None
 ) -> None:
@@ -161,7 +163,7 @@ def cool_print(
         heapq.heappush(event_queue, event)
     
     # Schedule placeholder additions sequentially with a small delay between them
-    placeholder_delay = generate_bell_curve_delay(lower_delay, upper_delay, z)  # 50ms between each placeholder addition
+    placeholder_delay = generate_bell_curve_delay(placeholder_lower_delay, placeholder_upper_delay, z)  # 50ms between each placeholder addition
     for index, char in enumerate(text):
         scheduled_time = start_time + index * placeholder_delay
         def action(index=index, char=char):
