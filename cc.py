@@ -1,6 +1,7 @@
 import random
 import copy
 from cool_print import cool_print
+from cool_print import linear_speed_up_delay_provider
 
 # Define a symbol for highlighting patterns
 HIGHLIGHT_SYMBOL = "*"
@@ -217,7 +218,7 @@ def print_board(board, highlights=None):
     txt = "   "
     for c in range(len(board[0])):
         txt += str(c) + " "
-    cool_print(txt, upper_delay=.15, placeholder_upper_delay=.015)
+    cool_print(txt, delay_provider=(lambda x, y: linear_speed_up_delay_provider(0.05, 0.1, x, y)))
     
     # Print each row with its index
     for r in range(len(board)):
@@ -231,7 +232,7 @@ def print_board(board, highlights=None):
                     txt += cell['symbol'] + " "
                 else:
                     txt += cell + " "
-        cool_print(txt, upper_delay=.15, placeholder_upper_delay=.015)
+        cool_print(txt, delay_provider=(lambda x, y: linear_speed_up_delay_provider(0.05, 0.1, x, y)))
 
 # Find patterns based on the rules
 def find_patterns(board, pieces):
@@ -318,11 +319,6 @@ def prompt_and_swap(board):
 
     # 3) Call your swap function (make sure to import or include swap_cells)
     swap_cells(board, (x1, y1), (x2, y2))
-
-    # 4) Optionally, print the board or do some other feedback
-    cool_print("Swap attempted. Current board:")
-    for row in board:
-        cool_print(" ".join(row))
 
 
 def play_game(width, height, pieces, wander):

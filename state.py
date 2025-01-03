@@ -3,6 +3,7 @@ import levelgen
 import json
 import player 
 from cool_print import cool_print
+from cool_print import fixed_time_linear_speed_up_provider
 
 WIDTH = 10
 HEIGHT = 10
@@ -80,7 +81,7 @@ class MainState:
         # check if state file exists
         fn = "state.json"
         if os.path.exists(fn):
-            cool_print("Loading existing game")
+            cool_print("Loading existing game", delay_provider=(lambda x, y: fixed_time_linear_speed_up_provider(3.5, x, y)))
             with open(fn, "r") as f:
                 self._state = json.load(f)
         else:

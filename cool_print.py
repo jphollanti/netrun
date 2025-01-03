@@ -5,6 +5,7 @@ import heapq
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Optional
 from colorama import init, Fore, Style
+from typing import List
 
 # Initialize colorama for cross-platform colored output
 init(autoreset=True)
@@ -55,18 +56,106 @@ def generate_bell_curve_delay(lower: float, upper: float, z: int = 2, max_attemp
     print(f"Warning: Could not find a delay within bounds after {max_attempts} attempts. Returning mu={mu}.")
     return mu
 
+
+def linear_speed_up_delay_provider(low, up, line_length, nth_character: int) -> List[float]:
+    """
+    Provides delay values for cool_print function with a slowing effect.
+    [lower_delay, upper_delay, placeholder_lower_delay, placeholder_upper_delay]
+    """
+    fraction_remains_l = low / 20
+    fraction_remains_u = up / 20
+    lower_delay = low - ((low - fraction_remains_l) * (nth_character / line_length))
+    upper_delay = up - ((up - fraction_remains_u) * (nth_character / line_length))
+    pl = low * 0.1
+    pu = up * 0.1
+    fraction_remains_l = pl / 20
+    fraction_remains_u = pu / 20
+    placeholder_lower_delay = pl - ((pl - fraction_remains_l) * (nth_character / line_length))
+    placeholder_upper_delay = pu - ((pu - fraction_remains_u) * (nth_character / line_length))
+    return [lower_delay, upper_delay, placeholder_lower_delay, placeholder_upper_delay]
+
+def fixed_time_linear_speed_up_provider(fixed_time: float, line_length: int, nth_character: int) -> List[float]:
+    """
+    It takes fixed_time for the full line to appear. At the start it's slow (longer delays)
+    and then it speeds up (shorter delays). This function returns a list of four values:
+    [lower_delay, upper_delay, placeholder_lower_delay, placeholder_upper_delay].
+
+    The approach here is to model the time between characters as an arithmetic sequence
+    that sums to fixed_time over the entire line_length. The first delay is largest,
+    the last delay is smallest.
+    """
+    # ----------------------------------------------------
+    # 1) We want an arithmetic sequence of delays: d_1, d_2, ..., d_line_length
+    # 2) Sum(d_1 to d_line_length) = fixed_time
+    # 3) The first delay (d_1) is the largest and the last delay (d_line_length) is the smallest.
+    #
+    # Let ratio = how many times bigger d_1 is compared to d_line_length (just a design choice).
+    # Then:
+    #     d_1 = ratio * d_line_length
+    #     sum = line_length * (d_1 + d_line_length) / 2 = fixed_time
+    #
+    # From sum, we solve for d_line_length:
+    #     line_length * (ratio * d_line_length + d_line_length) / 2 = fixed_time
+    #     line_length * (ratio + 1) * d_line_length / 2 = fixed_time
+    #     d_line_length = (2 * fixed_time) / (line_length * (ratio + 1))
+    # and hence
+    #     d_1 = ratio * d_line_length
+    #
+    # Once d_1 and d_line_length are known, the nth delay is found by:
+    #     d_n = d_1 + (n - 1) * (d_line_length - d_1) / (line_length - 1)
+    #
+    # ----------------------------------------------------
+
+    # You can tweak this ratio to control how “slow” the start is compared to the end
+    ratio = 3.0  # Means the first delay is 3x the last delay
+
+    # Compute d_line_length (smallest delay) and d_1 (largest delay)
+    d_line_length = (2.0 * fixed_time) / (line_length * (ratio + 1))
+    d_1 = ratio * d_line_length
+
+    # If line_length == 1, then nth_character == 1, we only have one delay
+    if line_length == 1:
+        d_n = fixed_time
+    else:
+        # Arithmetic progression step
+        step = (d_line_length - d_1) / (line_length - 1)
+        # Delay for the nth_character (1-indexed)
+        d_n = d_1 + (nth_character - 1) * step
+
+    # ----------------------------------------------------
+    # Return four delay values. 
+    #
+    # For example:
+    #   - lower_delay and upper_delay might be a “range” for normal characters
+    #   - placeholder_lower_delay and placeholder_upper_delay might be a “range” 
+    #     if you’re typing placeholders differently (faster, for example).
+    # 
+    # Adjust these multipliers as needed. 
+    # ----------------------------------------------------
+    lower_delay = 0.90 * d_n
+    upper_delay = 1.10 * d_n
+    placeholder_lower_delay = 0.40 * d_n
+    placeholder_upper_delay = 0.60 * d_n
+
+    return [lower_delay, upper_delay, placeholder_lower_delay, placeholder_upper_delay]
+
+def default_delay_provider(line_length, nth_character:int) -> List[float]:
+    """
+    Provides default delay values for cool_print function.
+    [lower_delay, upper_delay, placeholder_lower_delay, placeholder_upper_delay]
+    """
+    return [0.1, 0.3, 0.01, 0.02]
+
 def cool_print(
     *args,
     sep: str = ' ',
     end: str = '\n',
     file: Any = sys.stdout,
     flush: bool = False,
-    lower_delay: float = 0.1,
-    upper_delay: float = 0.3,
-    placeholder_lower_delay: float = 0.01,
-    placeholder_upper_delay: float = 0.02,
+    delay_provider: Callable[[int, int], List[float]] = default_delay_provider,
     z: int = 2,
-    color_map: Optional[Dict[int, str]] = None
+    color_map: Optional[Dict[int, str]] = None,
+    hide_cursor: bool = True  # New parameter to control cursor visibility
 ) -> None:
     """
     A custom print function that mimics Python's built-in print but with a dynamic typing effect.
@@ -85,6 +174,10 @@ def cool_print(
         color_map (Dict[int, str], optional): A dictionary mapping character indices to colorama color codes.
             Example: {0: Fore.RED, 7: Fore.BLUE}
     """
+    # ANSI escape codes for hiding and showing the cursor
+    HIDE_CURSOR = '\033[?25l'
+    SHOW_CURSOR = '\033[?25h'
+
     # Join the arguments using the specified separator
     text = sep.join(map(str, args))
 
@@ -154,6 +247,7 @@ def cool_print(
         update_display()
         
         # Schedule replacement
+        lower_delay, upper_delay, _, _ = delay_provider(len(current_chars), index)
         delay = generate_bell_curve_delay(lower_delay, upper_delay, z)
         replacement_time = time.time() + delay
         def action():
@@ -163,8 +257,9 @@ def cool_print(
         heapq.heappush(event_queue, event)
     
     # Schedule placeholder additions sequentially with a small delay between them
-    placeholder_delay = generate_bell_curve_delay(placeholder_lower_delay, placeholder_upper_delay, z)  # 50ms between each placeholder addition
     for index, char in enumerate(text):
+        _, _, placeholder_lower_delay, placeholder_upper_delay = delay_provider(len(current_chars), index)
+        placeholder_delay = generate_bell_curve_delay(placeholder_lower_delay, placeholder_upper_delay, z)
         scheduled_time = start_time + index * placeholder_delay
         def action(index=index, char=char):
             nonlocal active_replacements
@@ -183,12 +278,19 @@ def cool_print(
     
     # Main loop to process events
     while event_queue or replace_queue:
+        if hide_cursor:
+            file.write(HIDE_CURSOR)
+            file.flush()
         current_time = time.time()
         while event_queue and event_queue[0].scheduled_time <= current_time:
             event = heapq.heappop(event_queue)
             event.action()
         # Sleep for a short duration to prevent high CPU usage
         time.sleep(0.01)  # 10ms
+    
+    if hide_cursor:
+        file.write(SHOW_CURSOR)
+        file.flush()
     
     # After all replacements, append the end string
     file.write(end)

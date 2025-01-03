@@ -3,6 +3,7 @@ import json
 from colorama import Fore, Back, Style, init
 import node.node as node
 from cool_print import cool_print
+from cool_print import linear_speed_up_delay_provider
 
 # Initialize colorama
 init()
@@ -117,7 +118,7 @@ def visualize(width, height, route, current_loc):
     txt = "   "
     for c in range(width):
         txt += str(c) + " "
-    cool_print(txt, upper_delay=.15, placeholder_lower_delay=.005, placeholder_upper_delay=.01)
+    cool_print(txt, delay_provider=(lambda x, y: linear_speed_up_delay_provider(0.1, 0.2, x, y)))
 
     # visualize start, end, waypoints and paths
     for y in range(height):
@@ -139,10 +140,8 @@ def visualize(width, height, route, current_loc):
                 txt += visualize_cell(paths[key]) + " "
             else:
                 txt += ". "
-        # print(color_map)
-        mdel = y * .003
-        cool_print(txt, color_map=color_map, lower_delay=.1-mdel, upper_delay=.15-mdel, placeholder_lower_delay=.005-mdel, placeholder_upper_delay=.01-mdel)
-
+        
+        cool_print(txt, color_map=color_map, delay_provider=(lambda x, y: linear_speed_up_delay_provider(0.1, 0.2, x, y)))
 
 def generate_new_state(width, height, waypoints_number):
     start = {
