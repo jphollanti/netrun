@@ -1,160 +1,180 @@
+import time
+import pty
 import os
-import cmd
-import getpass
-import socket
+import subprocess
+from colorama import Fore, Style, init
+import select
+import sys
 
-try:
-    import paramiko
-    from scp import SCPClient
-except ImportError:
-    print("WARNING: paramiko and scp libraries not installed. SCP functionality won't be available.")
-    print("Install with: pip install paramiko scp\n")
+command_start = [
+    "docker",
+    "run",
+    "-d",
+    "--name", "netrun",
+    "ubuntu:latest", 
+    "tail", "-f", "/dev/null"
+]
 
-class MainFrame(cmd.Cmd):
-    intro = "Welcome to MyShell! Type ? to list commands.\n"
-    prompt = "(myshell) "
+command_rm = [
+    "docker",
+    "rm",
+    "-f",
+    "netrun"
+]
 
-    def do_ls(self, arg):
-        """List files in the current directory or in the provided path.
-        Usage: ls [path]
-        """
-        path = arg if arg else "."
-        try:
-            files = os.listdir(path)
-            for f in files:
-                print(f)
-        except OSError as e:
-            print(f"Error: {e}")
+command_exec = [
+    "docker",
+    "exec",
+    "-it",
+    "netrun",
+    "/bin/bash"
+]
 
-    def do_cd(self, arg):
-        """Change the current working directory.
-        Usage: cd <path>
-        """
-        if not arg:
-            print("Usage: cd <path>")
-            return
-        try:
-            os.chdir(arg)
-        except OSError as e:
-            print(f"Error: {e}")
+import random
+from datetime import datetime, timedelta
 
-    def do_pwd(self, arg):
-        """Print the current working directory."""
-        print(os.getcwd())
+# Predefined components for generating logs
+commands = [
+    "run with --install /usr/bin/awk awk /usr/bin/mawk 5 --slave /usr/share/man/man1/awk.1.gz awk.1.gz /usr/share/man/man1/mawk.1.gz --slave /usr/bin/nawk nawk /usr/bin/mawk --slave /usr/share/man/man1/nawk.1.gz nawk.1.gz /usr/share/man/man1/mawk.1.gz",
+    "link group awk updated to point to /usr/bin/mawk",
+    "run with --install /usr/bin/which which /usr/bin/which.debianutils 0 --slave /usr/share/man/man1/which.1.gz which.1.gz /usr/share/man/man1/which.debianutils.1.gz",
+    "link group which updated to point to /usr/bin/which.debianutils",
+    "run with --install /usr/share/man/man7/builtins.7.gz builtins.7.gz /usr/share/man/man7/bash-builtins.7.gz 10",
+    "link group builtins.7.gz updated to point to /usr/share/man/man7/bash-builtins.7.gz",
+    "run with --install /usr/sbin/rmt rmt /usr/sbin/rmt-tar 50 --slave /usr/share/man/man8/rmt.8.gz rmt.8.gz /usr/share/man/man8/rmt-tar.8.gz",
+    "link group rmt updated to point to /usr/sbin/rmt-tar",
+    "run with --remove builtins.7.gz /usr/share/man/man7/bash-builtins.7.gz",
+    "link group builtins.7.gz fully removed",
+    "auto-repair link group which",
+    "auto-repair link group awk",
+    "auto-repair link group rmt",
+    "auto-repair link group pager",
+]
 
-    def do_cat(self, arg):
-        """Display the contents of a file.
-        Usage: cat <filename>
-        """
-        if not arg:
-            print("Usage: cat <filename>")
-            return
+# Function to generate a random timestamp within the past two days
+def random_timestamp_within_past_2_days():
+    now = datetime.now()
+    past_2_days_start = now - timedelta(days=2)
+    random_time = past_2_days_start + timedelta(seconds=random.randint(0, 2 * 24 * 3600))
+    return random_time
 
-        try:
-            with open(arg, "r") as file:
-                print(file.read())
-        except OSError as e:
-            print(f"Error: {e}")
+# Function to generate random log entries
+def generate_log_entries(num_entries=500):
+    logs = []
+    for _ in range(num_entries):
+        timestamp = random_timestamp_within_past_2_days().strftime("%Y-%m-%d %H:%M:%S")
+        command = random.choice(commands)
+        log_entry = f"update-alternatives {timestamp}: {command}"
+        logs.append(log_entry)
+    return logs
 
-    def do_ip(self, arg):
-        """
-        Display the current IP address of this machine.
 
-        By default, this tries to discover the primary outbound IP address by connecting
-        a UDP socket to a public DNS server (8.8.8.8). If you have no internet connection
-        or are on a private network, you may need to adjust this code or use
-        a different approach.
-        """
-        try:
-            # Method: Create a UDP socket to an external address (Google DNS)
-            # and then read our own IP.
-            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-                s.connect(("8.8.8.8", 80))
-                ip_address = s.getsockname()[0]
-            print(f"My IP Address: {ip_address}")
-        except Exception as e:
-            print(f"Could not determine IP address: {e}")
+def run_command_in_container(command):
+    subprocess.run(["docker", "exec", "netrun", "bash", "-c", command], check=True)
 
-    def do_scp(self, arg):
-        """
-        Securely copy a file between local and remote systems using SCP.
-        Usage:
-            scp upload   <local_path>   user@host:<remote_path>
-            scp download user@host:<remote_path> <local_path>
-        Example:
-            scp upload myfile.txt user@192.168.1.10:/home/username/myfile.txt
-            scp download user@192.168.1.10:/home/username/myfile.txt myfile.txt
 
-        Note: This command prompts for an SSH password. Key-based auth is also possible
-              but would require a more advanced implementation (e.g., setting up Paramiko keys).
-        """
-        if 'paramiko' not in globals() or 'SCPClient' not in globals():
-            print("SCP functionality not available: paramiko/scp not installed.")
-            return
+def set_container_settings():
+    # Commands to modify settings
+    commands = [
+        # Enable color for ls and other commands
+        'echo "export LS_COLORS=\'di=34:fi=32\'" >> ~/.bashrc',
+        'echo "alias ls=\'ls --color=never\'" >> ~/.bashrc',
+        'echo "alias grep=\'grep --no-color\'" >> ~/.bashrc',
 
-        args = arg.split()
-        if len(args) != 3:
-            print("Usage:\n  scp upload   <local_path>   user@host:<remote_path>")
-            print("  scp download user@host:<remote_path> <local_path>")
-            return
+        # Set a colorful PS1 prompt
+        'echo \'export PS1="\\[\\e[32m\\]\\u@\\h:\\[\\e[34m\\]\\w\\[\\e[0m\\]$ "\' >> ~/.bashrc',
 
-        direction = args[0].lower()
-        path1 = args[1]
-        path2 = args[2]
+        # Enable bracketed paste mode
+        #'echo -e \'\\e[?2004h\' >> ~/.bashrc',
 
-        if direction == "upload":
-            local_path = path1
-            remote_info = path2
-        elif direction == "download":
-            remote_info = path1
-            local_path = path2
-        else:
-            print("First argument must be 'upload' or 'download'.")
-            return
+        # Set TERM to support color
+        #'echo "export TERM=xterm-256color" >> ~/.bashrc',
+    ]
 
-        # Minimal parsing of user@host:/remote_path
-        if "@" not in remote_info or ":" not in remote_info:
-            print("Error: remote path must be in user@host:/path form.")
-            return
+    # Execute each command in the container
+    for cmd in commands:
+        run_command_in_container(cmd)
 
-        user_host, remote_path = remote_info.split(":", 1)
-        if "@" not in user_host:
-            print("Error: remote path must be in user@host:/path form.")
-            return
+def exec_to_container():
+    # Create a pseudo-terminal pair
+    master, slave = pty.openpty()
+    
+    # Start the Docker exec command in the pseudo-terminal
+    process = subprocess.Popen(
+        command_exec,
+        stdin=slave,
+        stdout=slave,
+        stderr=slave,
+        text=True,
+        bufsize=0,  # Unbuffered output
+    )
 
-        user, host = user_host.split("@", 1)
+    default_color = Fore.LIGHTBLACK_EX
+    
+    try:
+        while True:
+            # Use select to check if there is data to read
+            rlist, _, _ = select.select([master], [], [], 0.1)
+            
+            if master in rlist:
+                # Read and decode output from the Docker container
+                output = os.read(master, 1024).decode('utf-8')
+                if output:
+                    # Print container response with a specific color
+                    print(f"{default_color}{output}{default_color}", end='')
 
-        # Prompt for password
-        password = getpass.getpass(f"Password for {user}@{host}: ")
+            # Check for user input to send to the container
+            if select.select([sys.stdin], [], [], 0.1)[0]:
+                user_input = input(f"{Fore.YELLOW}> {default_color}")  # Prompt in yellow
+                
+                if user_input.lower() in ["exit", "quit"]:
+                    print(f"{Fore.RED}Exiting...{default_color}")
+                    break
+                
+                # Send user input to the container
+                os.write(master, (user_input + "\n").encode('utf-8'))
+    except KeyboardInterrupt:
+        print(f"{Fore.RED}\nSession terminated.{default_color}")
+    finally:
+        process.terminate()
+        os.close(master)
+        os.close(slave)
 
-        # Create SSH client
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Accept unknown host keys automatically
-        try:
-            ssh.connect(hostname=host, username=user, password=password)
-        except paramiko.SSHException as e:
-            print(f"SSH connection error: {e}")
-            return
 
-        # Perform SCP
-        with SCPClient(ssh.get_transport()) as scp:
-            try:
-                if direction == "upload":
-                    scp.put(local_path, remote_path)
-                    print(f"Uploaded {local_path} to {remote_info}.")
-                else:  # download
-                    scp.get(remote_path, local_path)
-                    print(f"Downloaded {remote_info} to {local_path}.")
-            except Exception as e:
-                print(f"SCP error: {e}")
+def run_cmd(command):
+    try:
+        return subprocess.run(command, capture_output=True, text=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e.stderr.strip()}")
+        raise e
 
-        # Close SSH session
-        ssh.close()
 
-    def do_exit(self, arg):
-        """Exit the shell."""
-        print("Goodbye!")
-        return True
+def mainframe(_state):
+    print("Stopping any potential containers")
+    res = run_cmd(command_rm)
+    print(f"Result: {res.stdout.strip()}")
 
-if __name__ == '__main__':
-    MainFrame().cmdloop()
+    print("Starting a new container")
+    res = run_cmd(command_start)
+    print(f"Result: {res.stdout.strip()}")
+
+    time.sleep(.5)
+
+    # Generate 500 log entries for the past 2 days
+    log_entries = generate_log_entries(500)
+    # concatenate log entries to string
+    log_entries = "\n".join(log_entries)
+    run_command_in_container(f"echo '{log_entries}' >> /var/log/alternatives.log")
+
+    # Call the function to enable settings in the Docker container
+    set_container_settings()
+
+    print("Executing a shell in the container")
+    exec_to_container()
+
+
+if __name__ == "__main__":
+
+    # Initialize Colorama
+    init()
+    mainframe(None)
