@@ -335,7 +335,7 @@ def play_game(width, height, pieces, wander):
         prompt_and_swap(board)
 
         highlights = find_patterns(board, pieces)
-        cool_print("Board with Highlighted Patterns:")
+        cool_print("Board to solve:")
         print_board(board, highlights)
 
         wander -= 1

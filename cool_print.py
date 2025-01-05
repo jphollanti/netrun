@@ -155,7 +155,9 @@ def cool_print(
     delay_provider: Callable[[int, int], List[float]] = default_delay_provider,
     z: int = 2,
     color_map: Optional[Dict[int, str]] = None,
-    hide_cursor: bool = True  # New parameter to control cursor visibility
+    hide_cursor: bool = True,  # New parameter to control cursor visibility, 
+    fore_color: Any = Fore.GREEN, 
+    new_line_after_print: bool = False
 ) -> None:
     """
     A custom print function that mimics Python's built-in print but with a dynamic typing effect.
@@ -211,17 +213,19 @@ def cool_print(
         for idx, char_info in enumerate(current_chars):
             if char_info['status'] == 'placeholder':
                 # Apply custom color if specified
-                color = color_map.get(idx, Fore.GREEN) if color_map else Fore.GREEN
+                color = color_map.get(idx, fore_color) if color_map else fore_color
                 display_str += f"{color}{Style.DIM}{char_info['char']}"
             elif char_info['status'] == 'correct':
                 # Apply custom color if specified
-                color = color_map.get(idx, Fore.GREEN) if color_map else Fore.GREEN
+                color = color_map.get(idx, fore_color) if color_map else fore_color
                 display_str += f"{color}{Style.NORMAL}{char_info['char']}"
             else:
                 display_str += ' '  # Empty space for unprocessed characters
         # Write the reconstructed string
         file.write(display_str)
         file.flush()
+        if new_line_after_print:
+            file.write('\n')
     
     # Replacement function
     def replace_char(index: int, correct_char: str):

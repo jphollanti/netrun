@@ -1,6 +1,16 @@
 import time
 import random
 import node
+import sys
+import os
+from colorama import Fore
+
+# Import cool_print from parent directory
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+# Insert the parent directory at the beginning of sys.path
+sys.path.insert(0, parent_dir)
+from cool_print import cool_print
 
 black_ice_programs = [
     {
@@ -79,230 +89,248 @@ black_ice_programs = [
 
 
 def hellhound_action(_state):
-    print("You are being tracked by a Hellhound. You must make a choice:")
-    print("1. Face the hell hound")
-    print("2. Jack-out and escape. Continue to fight another day.")
+    cool_print("You are being tracked by a Hellhound. You must make a choice:")
+    cool_print("1. Face the hell hound")
+    cool_print("2. Jack-out and escape. Continue to fight another day.")
 
-    choice = input("Enter your choice: ")
+    cool_print("Enter your choice: ", fore_color=Fore.YELLOW)
+    choice = input()
     if choice == '2':
-        print("You escape just in time to evade the Hellhound.")
-        print("You live to fight another day.")
+        cool_print("You escape just in time to evade the Hellhound.")
+        cool_print("You live to fight another day.")
         exit()
     if choice == '1':
-        print("You face the Hellhound.")
+        cool_print("You face the Hellhound.")
 
         hh = black_ice_programs[0]
         player = _state._state['player']
 
         while (True): 
             if player['health'] <= 0:
-                print("You are defeated by the Hellhound.")
-                print("Game Over.")
+                cool_print("You are defeated by the Hellhound.")
+                cool_print("Game Over.")
                 exit()
             if hh['health'] <= 0:
                 break
             
-            print("Player Health: ", player['health'])
-            print("Hellhound Health: ", hh['health'])
+            cool_print("Player Health: ", player['health'])
+            cool_print("Hellhound Health: ", hh['health'])
             
-            print("Your turn to attack the Hellhound.")
-            print("roll 3d10 damage.")
-            print("Press any key to continue.")
+            cool_print("Your turn to attack the Hellhound.")
+            cool_print("roll 3d10 damage.")
+            cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
             input()
-            print("")
             damage = random.randint(1, 10) + random.randint(1, 10) + random.randint(1, 10)
-            print("You deal " + str(damage) + " damage to the Hellhound.")
+            cool_print("You deal " + str(damage) + " damage to the Hellhound.")
             hh['health'] -= damage
-            print("")
-            print("Hellhound attacks you.")
-            print("roll 2d6 damage.")
-            print("Press any key to continue.")
+            cool_print("")
+            cool_print("Hellhound attacks you.")
+            cool_print("roll 2d6 damage.")
+            cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
             input()
-            print("")
             damage = random.randint(1, 6) + random.randint(1, 6)
-            print("Hellhound deals " + str(damage) + " damage to you.")
-            player['health'] -= damage
-            print("")
-            print("Press any key to continue.")
+            cool_print("Hellhound deals " + str(damage) + " damage to you.", fore_color=Fore.RED)
+            _state.change_health(-damage)
+            cool_print("")
+            cool_print("Press any key to continue.")
             input()
-            print("")
+            cool_print("")
         
-        print("You defeated the Hellhound. This node is now secure and you can continue your mission.")
+        cool_print("You defeated the Hellhound. This node is now secure and you can continue your mission.")
 
         _state.complete_node()
 
 def raven_action(_state):
-    print("You are being attacked by a Raven. You must make a choice:")
-    print("1. Face the Raven")
-    print("2. Jack-out and escape. Continue to fight another day.")
+    cool_print("You are being attacked by a Raven. You must make a choice:")
+    cool_print("1. Face the Raven")
+    cool_print("2. Jack-out and escape. Continue to fight another day.")
 
-    choice = input("Enter your choice: ")
+    cool_print("Enter your choice: ", fore_color=Fore.YELLOW)
+    choice = input()
     if choice == '2':
-        print("You escape just in time to evade the Raven.")
-        print("You live to fight another day.")
+        cool_print("You escape just in time to evade the Raven.")
+        cool_print("You live to fight another day.")
         exit()
     if choice == '1':
-        print("You face the Raven.")
+        cool_print("You face the Raven.")
 
         raven = black_ice_programs[1]
         player = _state._state['player']
 
         while (True): 
             if player['health'] <= 0:
-                print("You are defeated by the Hellhound.")
-                print("Game Over.")
+                cool_print("You are defeated by the Raven.")
+                cool_print("Game Over.")
                 exit()
             if raven['health'] <= 0:
                 break
             
-            print("Player Health: ", player['health'])
-            print("Hellhound Health: ", raven['health'])
+            cool_print("Player Health: ", player['health'])
+            cool_print("Raven Health: ", raven['health'])
             
-            print("Your turn to attack the Hellhound.")
-            print("roll 3d10 damage.")
-            print("Press any key to continue.")
+            cool_print("Your turn to attack the Raven.")
+            cool_print("roll 3d10 damage.")
+            cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
             input()
-            print("")
             damage = random.randint(1, 10) + random.randint(1, 10) + random.randint(1, 10)
-            print("You deal " + str(damage) + " damage to the Hellhound.")
+            cool_print("You deal " + str(damage) + " damage to the Hellhound.")
             raven['health'] -= damage
-            print("")
-            print("Raven attacks you and your installed programs.")
-            print("roll 1d6. On 5 and 6 your programs are destroyed.")
-            print("Press any key to continue.")
+            cool_print("")
+            cool_print("Raven attacks you and your installed programs.")
+            cool_print("It rolls 1d6. On 5 and 6 your programs are destroyed.")
+            cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
             input()
-            print("")
             roll = random.randint(1, 6)
-            print("You rolled a " + str(roll) + ".")
+            cool_print("Raven rolled a " + str(roll) + ".")
             if roll > 4:
-                print("Raven destroys your installed programs.")
+                cool_print("Raven destroys your installed programs.", fore_color=Fore.RED)
                 _state.destroy_programs()
-                print("But, you have now cleared this node.")
+                cool_print("But, you have now cleared this node.")
                 break
             else:
-                print("Raven failed to destroy your installed programs.")
-                print("Press any key to continue.")
+                cool_print("Raven failed to destroy your installed programs.")
+                cool_print("Press any key to continue.")
                 input()
         
-        print("You defeated the Raven. This node is now secure and you can continue your mission.")
+        cool_print("You defeated the Raven. This node is now secure and you can continue your mission.")
 
         _state.complete_node()
 
 def wisp_action(_state):
-    print("You are being attacked by a Wisp. You must make a choice:")
-    print("1. Face the Wisp")
-    print("2. Jack-out and escape. Continue to fight another day.")
+    cool_print("You are being attacked by a Wisp. You must make a choice:")
+    cool_print("1. Face the Wisp")
+    cool_print("2. Jack-out and escape. Continue to fight another day.")
 
-    choice = input("Enter your choice: ")
+    cool_print("Enter your choice: ", fore_color=Fore.YELLOW)
+    choice = input()
     if choice == '2':
-        print("You escape just in time to evade the Wisp.")
-        print("You live to fight another day.")
+        cool_print("You escape just in time to evade the Wisp.")
+        cool_print("You live to fight another day.")
         exit()
     if choice == '1':
-        print("You face the Wisp.")
+        cool_print("You face the Wisp.")
 
         wisp = black_ice_programs[2]
         player = _state._state['player']
         
         while (True): 
             if player['health'] <= 0:
-                print("You are defeated by the Wisp.")
-                print("Game Over.")
+                cool_print("You are defeated by the Wisp.", Fore.RED)
+                cool_print("Game Over.", Fore.RED)
                 exit()
             if wisp['health'] <= 0:
                 break
             
-            print("Player Health: ", player['health'])
-            print("Wisp Health: ", wisp['health'])
+            cool_print("Player Health: ", player['health'])
+            cool_print("Wisp Health: ", wisp['health'])
             
-            print("Your turn to attack the Wisp.")
-            print("roll 3d10 damage.")
-            print("Press any key to continue.")
+            if player['stunned'] > 0:
+                cool_print("You are stunned and miss this turn.")
+                cool_print("Press any key to continue.")
+                input()
+                _state.unstun()
+                continue
+            else:
+                cool_print("Your turn to attack the Wisp.")
+                cool_print("roll 3d10 damage.")
+                cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
+                input()
+                damage = random.randint(1, 10) + random.randint(1, 10) + random.randint(1, 10)
+                cool_print("You deal " + str(damage) + " damage to the Wisp.")
+                wisp['health'] -= damage
+            
+            cool_print("")
+            cool_print("Wisp attacks you.")
+            cool_print("Wisp rolls 1d6 damage.")
+            cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
             input()
-            print("")
-            damage = random.randint(1, 10) + random.randint(1, 10) + random.randint(1, 10)
-            print("You deal " + str(damage) + " damage to the Wisp.")
-            wisp['health'] -= damage
-            print("")
-            print("Wisp attacks you and stuns you.")
-            print("roll 1d6 damage.")
-            print("Press any key to continue.")
-            input()
-            print("")
             damage = random.randint(1, 6)
-            print("Wisp deals " + str(damage) + " damage to you.")
-            player['health'] -= damage
-            print("")
-            print("Press any key to continue.")
+            cool_print("Wisp deals " + str(damage) + " damage to you.", fore_color=Fore.RED)
+            _state.change_health(-damage)
+            cool_print("")
+            cool_print("Wisp tries to stun you.")
+            cool_print("It rolls 1d6. On 5 and 6 you are slowed down.")
+            cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
             input()
-            print("")
+            roll = random.randint(1, 6)
+            cool_print("Wisp rolled a " + str(roll) + ".")
+            if roll > 4:
+                cool_print("Wisp stuns you. You will miss next turn", fore_color=Fore.RED)
+                _state.stun(roll)
+            cool_print("Press any key to continue.")
+            input()
+            cool_print("")
 
-        print("You defeated the Wisp. This node is now secure and you can continue your mission.")
+        cool_print("You defeated the Wisp. This node is now secure and you can continue your mission.")
         _state.complete_node()
 
 
 
 def kraken_action(_state):
-    print("You are trapped by a Kraken. You must make a choice:")
-    print("1. Attempt to escape the trap")
-    print("2. Confront the Kraken")
+    cool_print("You are trapped by a Kraken. You must make a choice:")
+    cool_print("1. Attempt to escape the trap")
+    cool_print("2. Confront the Kraken")
 
-    choice = input("Enter your choice: ")
+    cool_print("Enter your choice: ", fore_color=Fore.YELLOW)
+    choice = input()
     if choice == '1':
-        print("You attempt to escape the trap.")
+        cool_print("You attempt to escape the trap.")
         time.sleep(1)
-        print("The Kraken tightens its grip, making it difficult to escape.")
+        cool_print("The Kraken tightens its grip, making it difficult to escape.")
         time.sleep(1)
-        print("You struggle against the trap, but it seems to be getting stronger.")
+        cool_print("You struggle against the trap, but it seems to be getting stronger.")
         time.sleep(1)
-        print("You are immobilized by the Kraken.")
+        cool_print("You are immobilized by the Kraken.")
         time.sleep(1)
-        print("You are trapped in the system.")
+        cool_print("You are trapped in the system.")
         time.sleep(1)
-        print("Game Over.")
+        cool_print("Game Over.")
         exit()
 
 def scorpion_action(_state):
-    print("You are being attacked by a Scorpion. You must make a choice:")
-    print("1. Attempt to evade the attack")
-    print("2. Confront the attacker")
+    cool_print("You are being attacked by a Scorpion. You must make a choice:")
+    cool_print("1. Attempt to evade the attack")
+    cool_print("2. Confront the attacker")
 
-    choice = input("Enter your choice: ")
+    cool_print("Enter your choice: ", fore_color=Fore.YELLOW)
+    choice = input()
     if choice == '1':
-        print("You attempt to evade the attack.")
+        cool_print("You attempt to evade the attack.")
 
 def brainworm_action(_state):
-    print("You are being attacked by a Brainworm. You must make a choice:")
-    print("1. Attempt to evade the attack")
-    print("2. Confront the attacker")
+    cool_print("You are being attacked by a Brainworm. You must make a choice:")
+    cool_print("1. Attempt to evade the attack")
+    cool_print("2. Confront the attacker")
 
-    choice = input("Enter your choice: ")
+    cool_print("Enter your choice: ", fore_color=Fore.YELLOW)
+    choice = input()
     if choice == '1':
-        print("You attempt to evade the attack.")
+        cool_print("You attempt to evade the attack.")
 
 def bloodhound_action(_state):
-    print("You are being tracked by a Bloodhound. You must make a choice:")
-    print("1. Attempt to evade the trace")
-    print("2. Confront the tracker")
+    cool_print("You are being tracked by a Bloodhound. You must make a choice:")
+    cool_print("1. Attempt to evade the trace")
+    cool_print("2. Confront the tracker")
 
 def doppleganger_action(_state):
-    print("You are being attacked by a Doppelganger. You must make a choice:")
-    print("1. Attempt to evade the attack")
-    print("2. Confront the attacker")
+    cool_print("You are being attacked by a Doppelganger. You must make a choice:")
+    cool_print("1. Attempt to evade the attack")
+    cool_print("2. Confront the attacker")
 
-    choice = input("Enter your choice: ")
+    cool_print("Enter your choice: ", fore_color=Fore.YELLOW)
+    choice = input()
     if choice == '1':
-        print("You attempt to evade the attack.")
+        cool_print("You attempt to evade the attack.")
 
 ## main function
 def black_ice(_state):
-    print("You arrive at a node. Steam hisses in the empty virtual space as intrusion countermeasures begin to activate.")
-    print("")
+    cool_print("You arrive at a node. Steam hisses in the empty virtual space as intrusion countermeasures begin to activate.")
+    cool_print("")
 
     ice = random.choice(black_ice_programs)
 
-    print("You encounter a " + ice['name'] + " - a Black ICE program.")
-    print("Effect: " + ice['effect'])
+    cool_print("You encounter a " + ice['name'] + " - a Black ICE program.", new_line_after_print=True)
+    cool_print("Effect: " + ice['effect'])
 
-    print("")
+    cool_print("")
     ice['action'](_state)

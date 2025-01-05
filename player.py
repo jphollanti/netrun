@@ -95,9 +95,11 @@ deck_options = [
   ]
 
 
-def new_player():
+def new_player(name):
     player = {
-        'health': 10,
+        'name': name,
+        'health': 30,
+        'stunned': 0,
         'deck': [
             random.choice(deck_options),
             random.choice(deck_options),

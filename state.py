@@ -4,6 +4,8 @@ import json
 import player 
 from cool_print import cool_print
 from cool_print import fixed_time_linear_speed_up_provider
+from colorama import Fore
+import time
 
 WIDTH = 10
 HEIGHT = 10
@@ -81,13 +83,22 @@ class MainState:
         # check if state file exists
         fn = "state.json"
         if os.path.exists(fn):
-            cool_print("Loading existing game", delay_provider=(lambda x, y: fixed_time_linear_speed_up_provider(3.5, x, y)))
+            cool_print("Loading existing game...", delay_provider=(lambda x, y: fixed_time_linear_speed_up_provider(3.5, x, y)), end='')
+            time.sleep(1)
+            # TODO: Add logic to replace only parts of existing line
+            cool_print("Game loaded!            ")
             with open(fn, "r") as f:
                 self._state = json.load(f)
         else:
-            cool_print("Creating new game")
+            cool_print("Creating new game and character")
+            cool_print("Enter your character name: ", fore_color=Fore.YELLOW)
+            name = None
+            while not name and name != "":
+                name = input()
+                if name == "":
+                    cool_print("Name cannot be empty. Enter your character name: ", fore_color=Fore.YELLOW)
             route = levelgen.generate_new_state(WIDTH, HEIGHT, WAYPOINTS)
-            _player = player.new_player()
+            _player = player.new_player(name)
             self._state = {
                 'player': _player,
                 'route': route
@@ -95,6 +106,21 @@ class MainState:
 
             self.store()
     
+    def delete_state(self):
+        os.remove("state.json")
+
+    def change_health(self, amount):
+        self._state['player']['health'] += amount
+        self.store()
+    
+    def stun(self):
+        self._state['player']['stunned'] = 1
+        self.store()
+    
+    def unstun(self):
+        self._state['player']['stunned'] = 0
+        self.store()
+
     def store(self):
         with open("state.json", "w") as f:
             json.dump(self._state, f)

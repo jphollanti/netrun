@@ -6,7 +6,7 @@ import time
 import state
 import cc
 from cool_print import cool_print
-from colorama import Fore, Back, Style, init
+from colorama import Fore
 
 def main():
     _state = state.MainState()
@@ -14,22 +14,44 @@ def main():
     cool_print("")
     play = True
     while (play):
+
+        if _state._state['player']['health'] <= 0:
+            cool_print(f"Your character {_state._state['player']['name']} is dead.")
+            if _state._state['player']['health'] < -9:
+                cool_print(f"Like really, really dead (health = {_state._state['player']['health']}).")
+            cool_print(f"Game over man. Game over. ")
+            time.sleep(1)
+            cool_print(f"So sad, sigh.")
+            cool_print(f".")
+            time.sleep(.5)
+            cool_print(f"..")
+            time.sleep(.5)
+            cool_print(f"...")
+            cool_print(f"")
+            time.sleep(.5)
+            cool_print(f"R.I.P. {_state._state['player']['name']}.")
+            cool_print(f"")
+            time.sleep(2)
+            cool_print("Anyhoo! Start a new game? (y/n): ", fore_color=Fore.YELLOW)
+            choice = input()
+            if choice == 'y':
+                _state.delete_state()
+                _state.initialize()
+            play = False
+
         rloc = levelgen.get_current_route_loc(_state._state['route'])
         cool_print("Progress: ")
         print("")
         levelgen.visualize(state.WIDTH, state.HEIGHT, _state._state['route'], rloc['node']['location'])
         cool_print("You are at location: ", rloc['node']['location'])
+        cool_print("")
 
         if not rloc['completed']['node']:
             n = node.generate_node(rloc['node']['type'])
             n(_state)
         elif not rloc['completed']['path']:
             cool_print("You are at a path and you must choose to cross it or to escape.")
-            color_map = {}
-            txt = "Enter 'c' to cross the path or 'e' to escape: "
-            for i in range(len(txt)):
-                color_map[i] = Fore.YELLOW
-            cool_print("Enter 'c' to cross the path or 'e' to escape: ", color_map=color_map)
+            cool_print("Enter 'c' to cross the path or 'e' to escape: ", fore_color=Fore.YELLOW)
 
             choice = input()
 
@@ -58,7 +80,7 @@ def main():
                 
                 wander = 4
 
-                cool_print("To cross the path you must align the symbols on the following table in such a way:")
+                cool_print("To cross the path you must align the symbols either horizontally or vertially so they form continous lines:")
                 cool_print("")
                 for p in pieces:
                     example = p['symbol'] * p['length']
@@ -67,7 +89,7 @@ def main():
                 if cc.play_game(width, height, pieces, wander):
                     _state.complete_path()
                 else:
-                    cool_print("You dead, try again")
+                    cool_print("You dead, try again", fore_color=Fore.YELLOW)
                     play = False
         else:
             # should not happen, die

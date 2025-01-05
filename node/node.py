@@ -5,6 +5,9 @@ from . import firewall
 from . import competing_netrunner
 from . import trace_program
 from . import signal_interference
+from . import data_fortress
+from . import mainframe
+from . import data_core
 
 node_types = [
     'Black ICE', # ICE = Intrusion Countermeasures Electronics
@@ -15,7 +18,7 @@ node_types = [
     #'Signal Interference',
 ]
 
-end_node_types = ['Data Fortresses', 'Mainframe', 'Data Core']
+end_node_types = ['Mainframe', 'Data Core']
 
 def generate_node(type):
     # print("Generating node of type", type)
@@ -35,3 +38,10 @@ def generate_node(type):
     #     return trace_program.trace_program()
     # elif type == 'Signal Interference':
     #     return signal_interference.signal_interference()
+    elif type == 'Mainframe':
+        return mainframe.mainframe
+    elif type == 'Data Core':
+        return data_core.data_core
+    else:
+        raise Exception("Unknown node type: " + type)
+    
