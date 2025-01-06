@@ -285,45 +285,45 @@ def mainframe(_state):
         return [0.03, 0.1, 0.003, 0.01]
     
     cool_print("Welcome to the mainframe!")
-    cool_print("A mainframe functions the same way as old terminal systems, with a Unix-like command line interface.", delay_provider=delay_provider)
-    cool_print("You have root access, meaning you can access any file on the server.", delay_provider=delay_provider)
-    cool_print("At any point type in 'mission' to get a reminder of your mission.", delay_provider=delay_provider)
+    cool_print("A mainframe functions the same way as old terminal systems, with a Unix-like command line interface.", delay_provider=delay_provider, state=_state)
+    cool_print("You have root access, meaning you can access any file on the server.", delay_provider=delay_provider, state=_state)
+    cool_print("At any point type in 'mission' to get a reminder of your mission.", delay_provider=delay_provider, state=_state)
     cool_print("")
 
-    cool_print("Mission Briefing:")
-    cool_print("Find a file called access_log and remove the entry with your clients username 'holljuhp'.", delay_provider=min_delay_provider)
-    cool_print("Do not to delete the entire access log file. This will raise suspicion.", delay_provider=min_delay_provider)
-    cool_print("You can use command \"sed -i '/holljuhp/d' access_log\" to delete lines from the file that contain holljuhp", delay_provider=min_delay_provider)
-    cool_print("You only get one try. Make it count. Good luck!", delay_provider=min_delay_provider)
+    cool_print("Mission Briefing:", state=_state)
+    cool_print("Find a file called access_log and remove the entry with your clients username 'holljuhp'.", delay_provider=min_delay_provider, state=_state)
+    cool_print("Do not to delete the entire access log file. This will raise suspicion.", delay_provider=min_delay_provider, state=_state)
+    cool_print("You can use command \"sed -i '/holljuhp/d' access_log\" to delete lines from the file that contain holljuhp", delay_provider=min_delay_provider, state=_state)
+    cool_print("You only get one try. Make it count. Good luck!", delay_provider=min_delay_provider, state=_state)
     cool_print("")
 
-    cool_print("The folder structure in the mainframe is as follows:", delay_provider=delay_provider)
-    cool_print("  /", delay_provider=delay_provider)
-    cool_print("  ├── bin", delay_provider=delay_provider)
-    cool_print("  ├── dev", delay_provider=min_delay_provider)
-    cool_print("  ├── home", delay_provider=min_delay_provider)
-    cool_print("  │   ├── holljuhp", delay_provider=min_delay_provider)
-    cool_print("  │   │   ├── document.txt", delay_provider=min_delay_provider)
-    cool_print("  │   │   ├── notes.md", delay_provider=min_delay_provider)
-    cool_print("  │   │   ├── config.json", delay_provider=min_delay_provider)
-    cool_print("  │   │   ├── script.py", delay_provider=min_delay_provider)
-    cool_print("  │   │   └── logfile.log", delay_provider=min_delay_provider)
-    cool_print("  │   └── ... ", delay_provider=min_delay_provider)
-    cool_print("  ├── media", delay_provider=min_delay_provider)
-    cool_print("  ├── opt", delay_provider=min_delay_provider)
-    cool_print("  ├── root", delay_provider=min_delay_provider)
-    cool_print("  ├── sbin", delay_provider=min_delay_provider)
-    cool_print("  ├── sys", delay_provider=min_delay_provider)
-    cool_print("  ├── usr", delay_provider=min_delay_provider)
-    cool_print("  ├── boot", delay_provider=min_delay_provider)
-    cool_print("  ├── etc", delay_provider=min_delay_provider)
-    cool_print("  ├── lib", delay_provider=min_delay_provider)
-    cool_print("  ├── mnt", delay_provider=min_delay_provider)
-    cool_print("  ├── proc", delay_provider=min_delay_provider)
-    cool_print("  ├── run", delay_provider=min_delay_provider)
-    cool_print("  ├── srv", delay_provider=min_delay_provider)
-    cool_print("  ├── tmp", delay_provider=min_delay_provider)
-    cool_print("  ├── var", delay_provider=min_delay_provider)
+    cool_print("The folder structure in the mainframe is as follows:", delay_provider=delay_provider, state=_state)
+    cool_print("  /", delay_provider=delay_provider, state=_state)
+    cool_print("  ├── bin", delay_provider=delay_provider, state=_state)
+    cool_print("  ├── dev", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── home", delay_provider=min_delay_provider, state=_state)
+    cool_print("  │   ├── holljuhp", delay_provider=min_delay_provider, state=_state)
+    cool_print("  │   │   ├── document.txt", delay_provider=min_delay_provider, state=_state)
+    cool_print("  │   │   ├── notes.md", delay_provider=min_delay_provider, state=_state)
+    cool_print("  │   │   ├── config.json", delay_provider=min_delay_provider, state=_state)
+    cool_print("  │   │   ├── script.py", delay_provider=min_delay_provider, state=_state)
+    cool_print("  │   │   └── logfile.log", delay_provider=min_delay_provider, state=_state)
+    cool_print("  │   └── ... ", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── media", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── opt", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── root", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── sbin", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── sys", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── usr", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── boot", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── etc", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── lib", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── mnt", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── proc", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── run", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── srv", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── tmp", delay_provider=min_delay_provider, state=_state)
+    cool_print("  ├── var", delay_provider=min_delay_provider, state=_state)
 
     t1 = "  │   └── access_log "
     t2 = "<-- Contains access logs. This is the file you're after!"
@@ -331,18 +331,18 @@ def mainframe(_state):
     for i in range(len(t2)):
         color_map[len(t1) + i] = Fore.YELLOW
     
-    cool_print(t1 + t2, color_map=color_map)
+    cool_print(t1 + t2, color_map=color_map, state=_state)
     time.sleep(.5)
 
     cool_print("")
-    cool_print("Press any key to continue.")
+    cool_print("Press any key to continue.", fore_color=Fore.YELLOW, state=_state)
     input()
 
-    cool_print("Mainframe access initializing...")
+    cool_print("Mainframe access initializing...", state=_state)
     time.sleep(.4)
-    cool_print("Your senses numb as your consciousness is compressed into a stream of data.")
+    cool_print("Your senses numb as your consciousness is compressed into a stream of data.", state=_state)
     time.sleep(.4)
-    cool_print("Your consciousness simplified into a command line interface.")
+    cool_print("Your consciousness simplified into a command line interface.", state=_state)
     time.sleep(.4)
     # stopping any potential containers.
     res = run_cmd(command_rm)
@@ -390,7 +390,7 @@ def mainframe(_state):
     cool_print("Mainframe ready.")
 
     cool_print("")
-    cool_print("Press any key to continue.")
+    cool_print("Press any key to continue.", fore_color=Fore.YELLOW, state=_state)
     input()
 
     cool_print(" ############################################################### ", fore_color=MAIN_FRAME_FORE_COLOR, new_line_after_print=True, end='')
@@ -421,26 +421,26 @@ def mainframe(_state):
     res = run_cmd(["docker", "exec", "netrun", "ls", "/var"])
     # check if ls contains access_log
     if "access_log" in res.stdout:
-        cool_print(f"Access log file still in place in mainframe. So far so good!")
+        cool_print(f"Access log file still in place in mainframe. So far so good!", state=_state)
 
         # check if contents has holljuhp
         res = run_cmd(["docker", "exec", "netrun", "cat", access_log_path])
         if custom_entry["username"] in res.stdout:
-            cool_print(f"Entry with {custom_entry['username']} found in access log file.")
-            cool_print("Mission failed!")
+            cool_print(f"Entry with {custom_entry['username']} found in access log file.", state=_state)
+            cool_print("Mission failed!", state=_state)
             if _state:
                 _state.complete_mission(False)
         else:
-            cool_print(f"Entry with {custom_entry['username']} not found in access log file.")
-            cool_print("Good job! Mission accomplished!")
+            cool_print(f"Entry with {custom_entry['username']} not found in access log file.", state=_state)
+            cool_print("Good job! Mission accomplished!", state=_state)
             if _state:
                 _state.complete_mission(True)
     else:
-        cool_print("Access log file no longer present in mainframe.")
-        cool_print("Unfortunately, you removed the whole access log file. ")
-        cool_print("This creates too much noise and will result in further actions taken by the company.")
-        cool_print("They will find out the original file and it's contents.")
-        cool_print("Mission failed!")
+        cool_print("Access log file no longer present in mainframe.", state=_state)
+        cool_print("Unfortunately, you removed the whole access log file. ", state=_state)
+        cool_print("This creates too much noise and will result in further actions taken by the company.", state=_state)
+        cool_print("They will find out the original file and it's contents.", state=_state)
+        cool_print("Mission failed!", state=_state)
         if _state:
             _state.complete_mission(False)
 

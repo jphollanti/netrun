@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Optional
 from colorama import init, Fore, Style
 from typing import List
+import string
 
 # Initialize colorama for cross-platform colored output
 init(autoreset=True)
@@ -151,6 +152,37 @@ def min_delay_provider(x, y):
     return [0.003, 0.01, 0.0003, 0.001]
 
 
+def replace_with_random(original, ratio):
+    """
+    Replace characters in a string with random characters based on the ratio.
+    
+    Parameters:
+        original (str): The input string.
+        ratio (float): The ratio of characters to replace (0 to 1).
+
+    Returns:
+        str: The modified string.
+    """
+    if not (0 <= ratio <= 1):
+        return original
+    
+    length = len(original)
+    num_to_replace = int(length * ratio)
+    
+    # Randomly select indices to replace
+    indices = random.sample(range(length), num_to_replace)
+    
+    # Convert string to list for mutability
+    char_list = list(original)
+    
+    for index in indices:
+        # Replace character at the index with a random character
+        char_list[index] = generate_half_width_katakana()
+    
+    # Join list back into string
+    return [''.join(char_list), indices]
+
+
 def cool_print(
     *args,
     sep: str = ' ',
@@ -162,7 +194,8 @@ def cool_print(
     color_map: Optional[Dict[int, str]] = None,
     hide_cursor: bool = True,  # New parameter to control cursor visibility, 
     fore_color: Any = Fore.GREEN, 
-    new_line_after_print: bool = False
+    new_line_after_print: bool = False, 
+    state = None
 ) -> None:
     """
     A custom print function that mimics Python's built-in print but with a dynamic typing effect.
@@ -192,6 +225,19 @@ def cool_print(
         print("")
         return
     
+    garbled = []
+    if state:
+        # based on health, garble up the text
+        health = state._state['player']['health']
+        randomize = 0
+        if health < 20:
+            randomize = .01
+        if health < 10:
+            randomize = .03
+        if health < 5:
+            randomize = .06
+        text, garbled = replace_with_random(text, randomize)
+
     # Initialize the current_chars list with 'empty' status
     current_chars = [{'char': ' ', 'status': 'empty'} for _ in text]
     
@@ -211,6 +257,7 @@ def cool_print(
         """
         Rewrites the entire row based on the current_chars list, applying custom colors if specified.
         """
+        nonlocal garbled
         # Move cursor to the beginning of the line
         file.write('\r')
         # Reconstruct the display string with appropriate styling
@@ -222,8 +269,11 @@ def cool_print(
                 display_str += f"{color}{Style.DIM}{char_info['char']}"
             elif char_info['status'] == 'correct':
                 # Apply custom color if specified
+                style = Style.NORMAL
+                if idx in garbled:
+                    style = Style.DIM
                 color = color_map.get(idx, fore_color) if color_map else fore_color
-                display_str += f"{color}{Style.NORMAL}{char_info['char']}"
+                display_str += f"{color}{style}{char_info['char']}"
             else:
                 display_str += ' '  # Empty space for unprocessed characters
         # Write the reconstructed string

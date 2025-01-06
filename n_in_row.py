@@ -214,12 +214,12 @@ def do_wander(board, pieces, piece_locs, wander):
     return board
 
 # Print the board to the console
-def print_board(board, highlights=None):
+def print_board(board, highlights=None, state=None):
     # Print a header with column indices
     txt = "   "
     for c in range(len(board[0])):
         txt += str(c) + " "
-    cool_print(txt, delay_provider=(lambda x, y: linear_speed_up_delay_provider(0.05, 0.1, x, y)))
+    cool_print(txt, delay_provider=(lambda x, y: linear_speed_up_delay_provider(0.05, 0.1, x, y)), state=state)
     
     # Print each row with its index
     for r in range(len(board)):
@@ -236,7 +236,7 @@ def print_board(board, highlights=None):
         delay_provider = min_delay_provider #lambda x, y: linear_speed_up_delay_provider(0.05, 0.1, x, y)
         # if r > 1:
         #     delay_provider = min_delay_provider
-        cool_print(txt, delay_provider=delay_provider)
+        cool_print(txt, delay_provider=delay_provider, state=state)
 
 # Find patterns based on the rules
 def find_patterns(board, pieces):
@@ -325,12 +325,12 @@ def prompt_and_swap(board):
     swap_cells(board, (x1, y1), (x2, y2))
 
 
-def play_game(width, height, pieces, wander):
+def play_game(width, height, pieces, wander, state=None):
     _, board = initialize_board(width, height, pieces, ALL_SYMBOLS, wander)
     #print("Initial Board:")
     #print_board(original_board)
 
-    cool_print("Board to solve:")
+    cool_print("Board to solve:", state=state)
     print_board(board)
 
     while wander > 0:
@@ -339,8 +339,8 @@ def play_game(width, height, pieces, wander):
         prompt_and_swap(board)
 
         highlights = find_patterns(board, pieces)
-        cool_print("Board to solve:")
-        print_board(board, highlights)
+        cool_print("Board to solve:", state=state)
+        print_board(board, highlights, state=state)
 
         wander -= 1
     

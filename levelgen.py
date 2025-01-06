@@ -47,7 +47,7 @@ def get_current_route_loc(route):
     return None
 
 
-def visualize(width, height, route, current_loc):
+def visualize(width, height, route, current_loc, state=None):
 
     #print(json.dumps(route, indent=4))  
     paths = {}
@@ -119,7 +119,7 @@ def visualize(width, height, route, current_loc):
     txt = "   "
     for c in range(width):
         txt += str(c) + " "
-    cool_print(txt, delay_provider=(lambda x, y: linear_speed_up_delay_provider(0.1, 0.2, x, y)))
+    cool_print(txt, delay_provider=(lambda x, y: linear_speed_up_delay_provider(0.1, 0.2, x, y)), state=state)
 
     # visualize start, end, waypoints and paths
     for y in range(height):
@@ -146,7 +146,7 @@ def visualize(width, height, route, current_loc):
         # delay_provider = lambda x, y: linear_speed_up_delay_provider(0.1, 0.2, x, y)
         # if y > 1:
         #     delay_provider = min_delay_provider
-        cool_print(txt, color_map=color_map, delay_provider=delay_provider)
+        cool_print(txt, color_map=color_map, delay_provider=delay_provider, state=state)
 
 def generate_new_state(width, height, waypoints_number):
     start = {

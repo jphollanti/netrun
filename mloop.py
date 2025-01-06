@@ -14,7 +14,6 @@ def main():
     cool_print("")
     play = True
     while (play):
-
         if _state._state['player']['health'] <= 0:
             cool_print(f"Your character {_state._state['player']['name']} is dead.")
             if _state._state['player']['health'] < -9:
@@ -40,23 +39,23 @@ def main():
             play = False
 
         rloc = levelgen.get_current_route_loc(_state._state['route'])
-        cool_print("Progress: ")
+        cool_print("Progress: ", state=_state)
         print("")
-        levelgen.visualize(state.WIDTH, state.HEIGHT, _state._state['route'], rloc['node']['location'])
-        cool_print("You are at location: ", rloc['node']['location'])
+        levelgen.visualize(state.WIDTH, state.HEIGHT, _state._state['route'], rloc['node']['location'], state=_state)
+        cool_print("You are at location: ", rloc['node']['location'], state=_state)
         cool_print("")
 
         if not rloc['completed']['node']:
             n = node.generate_node(rloc['node']['type'])
             n(_state)
         elif not rloc['completed']['path']:
-            cool_print("You are at a path and you must choose to cross it or to escape.")
+            cool_print("You are at a path and you must choose to cross it or to escape.", state=_state)
             cool_print("Enter 'c' to cross the path or 'e' to escape: ", fore_color=Fore.YELLOW)
 
             choice = input()
 
             if choice == 'e':
-                cool_print("You escaped the challenge and live to see another day.")
+                cool_print("You escaped the challenge and live to see another day.", state=_state)
                 play = False
             elif choice == 'c':
                 # get from path length of two continuous sections of the path
@@ -80,13 +79,13 @@ def main():
                 
                 wander = 4
 
-                cool_print("To cross the path you must align the symbols either horizontally or vertially so they form continous lines:")
+                cool_print("To cross the path you must align the symbols either horizontally or vertially so they form continous lines:", state=_state)
                 cool_print("")
                 for p in pieces:
                     example = p['symbol'] * p['length']
                     cool_print(p['symbol'] + ": " + str(p['length']) + " (example: " + example + ")")
 
-                if n_in_row.play_game(width, height, pieces, wander):
+                if n_in_row.play_game(width, height, pieces, wander, state=_state):
                     _state.complete_path()
                 else:
                     cool_print("You dead, try again", fore_color=Fore.YELLOW)
