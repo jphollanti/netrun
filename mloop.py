@@ -4,7 +4,7 @@ import logging
 from node import node
 import time
 import state
-import cc
+import n_in_row
 from cool_print import cool_print
 from colorama import Fore
 
@@ -86,7 +86,7 @@ def main():
                     example = p['symbol'] * p['length']
                     cool_print(p['symbol'] + ": " + str(p['length']) + " (example: " + example + ")")
 
-                if cc.play_game(width, height, pieces, wander):
+                if n_in_row.play_game(width, height, pieces, wander):
                     _state.complete_path()
                 else:
                     cool_print("You dead, try again", fore_color=Fore.YELLOW)
