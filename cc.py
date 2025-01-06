@@ -2,6 +2,7 @@ import random
 import copy
 from cool_print import cool_print
 from cool_print import linear_speed_up_delay_provider
+from cool_print import min_delay_provider
 
 # Define a symbol for highlighting patterns
 HIGHLIGHT_SYMBOL = "*"
@@ -232,7 +233,10 @@ def print_board(board, highlights=None):
                     txt += cell['symbol'] + " "
                 else:
                     txt += cell + " "
-        cool_print(txt, delay_provider=(lambda x, y: linear_speed_up_delay_provider(0.05, 0.1, x, y)))
+        delay_provider = min_delay_provider #lambda x, y: linear_speed_up_delay_provider(0.05, 0.1, x, y)
+        # if r > 1:
+        #     delay_provider = min_delay_provider
+        cool_print(txt, delay_provider=delay_provider)
 
 # Find patterns based on the rules
 def find_patterns(board, pieces):
@@ -306,13 +310,13 @@ def prompt_and_swap(board):
     then call swap_cells to swap those positions on the board.
     """
     # 1) Prompt user for the first cell (x1, y1)
-    cool_print("Enter coordinates of the first cell (x1 y1):")
+    cool_print("Enter coordinates of the first cell (x1 y1):", delay_provider=min_delay_provider)
     inp = input()
     x1_str, y1_str = inp.split()
     x1, y1 = int(x1_str), int(y1_str)
 
     # 2) Prompt user for the second cell (x2, y2)
-    cool_print("Enter coordinates of the second cell (x2 y2):")
+    cool_print("Enter coordinates of the second cell (x2 y2):", delay_provider=min_delay_provider)
     inp = input()
     x2_str, y2_str = inp.split()
     x2, y2 = int(x2_str), int(y2_str)

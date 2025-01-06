@@ -1,6 +1,7 @@
 import sys
 import os
 from colorama import Fore
+import time
 
 # Import cool_print from parent directory
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -17,7 +18,12 @@ def jack_in(_state):
     cool_print("Enter your choice: ", fore_color=Fore.YELLOW)
     choice = input()
     if choice == '1':
-        cool_print("You jack into the system.")
+        cool_print("You jack into the system...")
+        time.sleep(.5)
+        cool_print("Your stomach turns as your conscious experience gets reduced to a stream of data.")
+        time.sleep(.5)
+        cool_print("And turns again as you re-emerge in the sterile virtual space of netrun.")
+        time.sleep(.5)
         _state.complete_node()
     elif choice == '2':
         cool_print("You leave the Jack-In point.")

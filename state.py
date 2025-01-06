@@ -152,7 +152,7 @@ class MainState:
         self.store()
         cool_print("Programs destroyed")
     
-    def complete_mission(success):
+    def complete_mission(self, success):
         cool_print("Mission complete")
         cool_print("Success" if success else "Failure")
         cool_print("Game over")

@@ -4,6 +4,7 @@ from colorama import Fore, Back, Style, init
 import node.node as node
 from cool_print import cool_print
 from cool_print import linear_speed_up_delay_provider
+from cool_print import min_delay_provider
 
 # Initialize colorama
 init()
@@ -141,7 +142,11 @@ def visualize(width, height, route, current_loc):
             else:
                 txt += ". "
         
-        cool_print(txt, color_map=color_map, delay_provider=(lambda x, y: linear_speed_up_delay_provider(0.1, 0.2, x, y)))
+        delay_provider = min_delay_provider
+        # delay_provider = lambda x, y: linear_speed_up_delay_provider(0.1, 0.2, x, y)
+        # if y > 1:
+        #     delay_provider = min_delay_provider
+        cool_print(txt, color_map=color_map, delay_provider=delay_provider)
 
 def generate_new_state(width, height, waypoints_number):
     start = {

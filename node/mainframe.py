@@ -16,7 +16,7 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # Insert the parent directory at the beginning of sys.path
 sys.path.insert(0, parent_dir)
 from cool_print import cool_print
-from cool_print import fixed_time_linear_speed_up_provider
+from cool_print import min_delay_provider
 
 # Path for the access log
 access_log_path = "/var/access_log"
@@ -260,7 +260,7 @@ def exec_to_container():
                 user_input = input(f"{Fore.YELLOW}> {default_color}")  # Prompt in yellow
                 
                 if user_input.lower() in ["exit", "quit"]:
-                    print(f"{Fore.RED}Exiting...{default_color}")
+                    print(f"{Fore.RED}Session terminated...{default_color}")
                     break
                 
                 # Send user input to the container
@@ -281,24 +281,20 @@ def run_cmd(command):
         raise e
 
 def mainframe(_state):
-
-    def min_delay_provider(x, y):
-        return [0.003, 0.01, 0.0003, 0.001]
-
     def delay_provider(x, y):
         return [0.03, 0.1, 0.003, 0.01]
     
     cool_print("Welcome to the mainframe!")
     cool_print("A mainframe functions the same way as old terminal systems, with a Unix-like command line interface.", delay_provider=delay_provider)
     cool_print("You have root access, meaning you can access any file on the server.", delay_provider=delay_provider)
-    cool_print("At any point type in mission to get a reminder of your mission.", delay_provider=delay_provider)
+    cool_print("At any point type in 'mission' to get a reminder of your mission.", delay_provider=delay_provider)
     cool_print("")
 
     cool_print("Mission Briefing:")
-    cool_print("You get one chance to find a file called access_log and remove the entry with your clients username 'holljuhp'.", delay_provider=min_delay_provider)
+    cool_print("Find a file called access_log and remove the entry with your clients username 'holljuhp'.", delay_provider=min_delay_provider)
     cool_print("Do not to delete the entire access log file. This will raise suspicion.", delay_provider=min_delay_provider)
     cool_print("You can use command \"sed -i '/holljuhp/d' access_log\" to delete lines from the file that contain holljuhp", delay_provider=min_delay_provider)
-    cool_print("Good luck!", delay_provider=min_delay_provider)
+    cool_print("You only get one try. Make it count. Good luck!", delay_provider=min_delay_provider)
     cool_print("")
 
     cool_print("The folder structure in the mainframe is as follows:", delay_provider=delay_provider)
@@ -338,25 +334,30 @@ def mainframe(_state):
     cool_print(t1 + t2, color_map=color_map)
     time.sleep(.5)
 
+    cool_print("")
     cool_print("Press any key to continue.")
     input()
 
     cool_print("Mainframe access initializing...")
+    time.sleep(.4)
+    cool_print("Your senses numb as your consciousness is compressed into a stream of data.")
+    time.sleep(.4)
+    cool_print("Your consciousness simplified into a command line interface.")
+    time.sleep(.4)
     # stopping any potential containers.
     res = run_cmd(command_rm)
 
     # starting a new container.
     res = run_cmd(command_start)
 
-    time.sleep(.5)
-
     # Mission help file
     fn = "/usr/bin/mission"
     file_contents =[
         "echo 'Mission Briefing:'",
-        "echo 'You get one chance to find a file called access_log and remove the entry with your clients username holljuhp.'",
+        "echo 'Find a file called access_log and remove the entry with your clients username \'holljuhp\'.",
         "echo 'Do not to delete the entire access log file. This will raise suspicion.'",
-        "echo 'Good luck!'",
+        "echo 'You can use command \"sed -i \'/holljuhp/d\' access_log\" to delete lines from the file that contain \'holljuhp\'",
+        "echo 'You only get one try. Make it count. Good luck!'",
     ]
     file_data = '\n'.join(file_contents)
     escaped_content = file_data.replace('\\', '\\\\').replace('"', '\\"').replace('$', '\\$')
@@ -383,8 +384,23 @@ def mainframe(_state):
     # Call the function to enable settings in the Docker container
     set_container_settings()
 
+    # create random session id from current date and time with length 7
+    sesid = datetime.now().strftime("%m%d%H%M%S")[-7:]
+
     cool_print("Mainframe ready.")
-    cool_print(" ############################################################### ", fore_color=MAIN_FRAME_FORE_COLOR, new_line_after_print=True)
+
+    cool_print("")
+    cool_print("Press any key to continue.")
+    input()
+
+    cool_print(" ############################################################### ", fore_color=MAIN_FRAME_FORE_COLOR, new_line_after_print=True, end='')
+    time.sleep(.4)
+    cool_print(f"                                                                ", end='')
+    cool_print(f" # 33# # # !/Ex#3- # # Session #{sesid} # # dA!X$# # # #### # ##", fore_color=Fore.LIGHTRED_EX, end='')
+    time.sleep(.4)
+    cool_print(f"                                                                ", end='')
+    cool_print(f" # 33# # # !/Ex#3- # # Session {sesid} ## # dA!X$# # # #### # ##", fore_color=MAIN_FRAME_FORE_COLOR)
+    cool_print(" # ", fore_color=MAIN_FRAME_FORE_COLOR)
     cool_print(" # Session established ", fore_color=MAIN_FRAME_FORE_COLOR)
     cool_print(" # Type 'exit' to end the session ", fore_color=MAIN_FRAME_FORE_COLOR)
     cool_print(" ############################################################### ", fore_color=MAIN_FRAME_FORE_COLOR)
@@ -395,11 +411,17 @@ def mainframe(_state):
     except Exception as e:
         print(f"Error: {e}")
 
+    cool_print("Exited mainframe.")
+    cool_print("You're back in the familiar virtual space of netrun...", delay_provider=min_delay_provider)
+    cool_print("\"Breathing\" familiar virtual air.", delay_provider=min_delay_provider)
+    cool_print("You feel liberated, like having escaped a dentists chair. ", delay_provider=min_delay_provider)
+    time.sleep(.5)
+
     # check if the file with access logs exists
     res = run_cmd(["docker", "exec", "netrun", "ls", "/var"])
     # check if ls contains access_log
     if "access_log" in res.stdout:
-        print(f"Access log file found in container.")
+        cool_print(f"Access log file still in place in mainframe. So far so good!")
 
         # check if contents has holljuhp
         res = run_cmd(["docker", "exec", "netrun", "cat", access_log_path])
@@ -414,7 +436,7 @@ def mainframe(_state):
             if _state:
                 _state.complete_mission(True)
     else:
-        cool_print(f"Access log file not found in container.")
+        cool_print("Access log file no longer present in mainframe.")
         cool_print("Unfortunately, you removed the whole access log file. ")
         cool_print("This creates too much noise and will result in further actions taken by the company.")
         cool_print("They will find out the original file and it's contents.")

@@ -146,6 +146,11 @@ def default_delay_provider(line_length, nth_character:int) -> List[float]:
     """
     return [0.1, 0.3, 0.01, 0.02]
 
+
+def min_delay_provider(x, y):
+    return [0.003, 0.01, 0.0003, 0.001]
+
+
 def cool_print(
     *args,
     sep: str = ' ',

@@ -5,7 +5,6 @@ from . import firewall
 from . import competing_netrunner
 from . import trace_program
 from . import signal_interference
-from . import data_fortress
 from . import mainframe
 from . import data_core
 
