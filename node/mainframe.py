@@ -10,8 +10,18 @@ from datetime import datetime, timedelta
 import random
 from datetime import datetime, timedelta
 
+# Import cool_print from parent directory
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+# Insert the parent directory at the beginning of sys.path
+sys.path.insert(0, parent_dir)
+from cool_print import cool_print
+from cool_print import fixed_time_linear_speed_up_provider
+
 # Path for the access log
 access_log_path = "/var/access_log"
+
+MAIN_FRAME_FORE_COLOR = Fore.CYAN
 
 # Generate a large list of fictional pages for access logs with page IDs
 base_pages = [
@@ -89,6 +99,10 @@ def create_users_and_files_in_container(num_users=44):
         user_path = os.path.join(home_base_path, username)
         run_command_in_container(f"mkdir -p {user_path}")
         create_sample_files_in_container(user_path)
+    
+    user_path = os.path.join(home_base_path, "holljuhp")
+    run_command_in_container(f"mkdir -p {user_path}")
+    create_sample_files_in_container(user_path)
 
 # Function to generate random usernames
 def generate_random_username():
@@ -106,7 +120,6 @@ def generate_access_logs_in_container(num_entries=2000, custom_entry=None):
         page = random.choice(pages)
         access_type = "[ESCALATED ACCESS]" if random.random() < 0.1 else ""
         method = random.choice(http_methods)
-
 
         # Insert the custom entry at a random position if not already added
         if custom_entry and not custom_added and random.random() < 1 / (num_entries - i):
@@ -196,13 +209,12 @@ def run_command_in_container(command):
 def set_container_settings():
     # Commands to modify settings
     commands = [
-        # Enable color for ls and other commands
+        # disable colors for ls and grep
         'echo "export LS_COLORS=\'di=34:fi=32\'" >> ~/.bashrc',
         'echo "alias ls=\'ls --color=never\'" >> ~/.bashrc',
         'echo "alias grep=\'grep --color=never\'" >> ~/.bashrc',
 
-        # Set a colorful PS1 prompt
-        'echo \'PS1="\\u@\\h \\w\\$ "\' >> ~/.bashrc',
+        'echo \'PS1=" # \\u\\$ (\\#): "\' >> ~/.bashrc',
 
         # Enable bracketed paste mode
         #'echo -e \'\\e[?2004h\' >> ~/.bashrc',
@@ -229,7 +241,7 @@ def exec_to_container():
         bufsize=0,  # Unbuffered output
     )
 
-    default_color = Fore.LIGHTBLACK_EX
+    default_color = MAIN_FRAME_FORE_COLOR
     
     try:
         while True:
@@ -269,19 +281,92 @@ def run_cmd(command):
         raise e
 
 def mainframe(_state):
-    print("Stopping any potential containers")
-    res = run_cmd(command_rm)
-    print(f"Result: {res.stdout.strip()}")
 
-    print("Starting a new container")
+    def min_delay_provider(x, y):
+        return [0.003, 0.01, 0.0003, 0.001]
+
+    def delay_provider(x, y):
+        return [0.03, 0.1, 0.003, 0.01]
+    
+    cool_print("Welcome to the mainframe!")
+    cool_print("A mainframe functions the same way as old terminal systems, with a Unix-like command line interface.", delay_provider=delay_provider)
+    cool_print("You have root access, meaning you can access any file on the server.", delay_provider=delay_provider)
+    cool_print("At any point type in mission to get a reminder of your mission.", delay_provider=delay_provider)
+    cool_print("")
+
+    cool_print("Mission Briefing:")
+    cool_print("You get one chance to find a file called access_log and remove the entry with your clients username 'holljuhp'.", delay_provider=min_delay_provider)
+    cool_print("Do not to delete the entire access log file. This will raise suspicion.", delay_provider=min_delay_provider)
+    cool_print("You can use command \"sed -i '/holljuhp/d' access_log\" to delete lines from the file that contain holljuhp", delay_provider=min_delay_provider)
+    cool_print("Good luck!", delay_provider=min_delay_provider)
+    cool_print("")
+
+    cool_print("The folder structure in the mainframe is as follows:", delay_provider=delay_provider)
+    cool_print("  /", delay_provider=delay_provider)
+    cool_print("  ├── bin", delay_provider=delay_provider)
+    cool_print("  ├── dev", delay_provider=min_delay_provider)
+    cool_print("  ├── home", delay_provider=min_delay_provider)
+    cool_print("  │   ├── holljuhp", delay_provider=min_delay_provider)
+    cool_print("  │   │   ├── document.txt", delay_provider=min_delay_provider)
+    cool_print("  │   │   ├── notes.md", delay_provider=min_delay_provider)
+    cool_print("  │   │   ├── config.json", delay_provider=min_delay_provider)
+    cool_print("  │   │   ├── script.py", delay_provider=min_delay_provider)
+    cool_print("  │   │   └── logfile.log", delay_provider=min_delay_provider)
+    cool_print("  │   └── ... ", delay_provider=min_delay_provider)
+    cool_print("  ├── media", delay_provider=min_delay_provider)
+    cool_print("  ├── opt", delay_provider=min_delay_provider)
+    cool_print("  ├── root", delay_provider=min_delay_provider)
+    cool_print("  ├── sbin", delay_provider=min_delay_provider)
+    cool_print("  ├── sys", delay_provider=min_delay_provider)
+    cool_print("  ├── usr", delay_provider=min_delay_provider)
+    cool_print("  ├── boot", delay_provider=min_delay_provider)
+    cool_print("  ├── etc", delay_provider=min_delay_provider)
+    cool_print("  ├── lib", delay_provider=min_delay_provider)
+    cool_print("  ├── mnt", delay_provider=min_delay_provider)
+    cool_print("  ├── proc", delay_provider=min_delay_provider)
+    cool_print("  ├── run", delay_provider=min_delay_provider)
+    cool_print("  ├── srv", delay_provider=min_delay_provider)
+    cool_print("  ├── tmp", delay_provider=min_delay_provider)
+    cool_print("  ├── var", delay_provider=min_delay_provider)
+
+    t1 = "  │   └── access_log "
+    t2 = "<-- Contains access logs. This is the file you're after!"
+    color_map = {}
+    for i in range(len(t2)):
+        color_map[len(t1) + i] = Fore.YELLOW
+    
+    cool_print(t1 + t2, color_map=color_map)
+    time.sleep(.5)
+
+    cool_print("Press any key to continue.")
+    input()
+
+    cool_print("Mainframe access initializing...")
+    # stopping any potential containers.
+    res = run_cmd(command_rm)
+
+    # starting a new container.
     res = run_cmd(command_start)
-    print(f"Result: {res.stdout.strip()}")
 
     time.sleep(.5)
 
+    # Mission help file
+    fn = "/usr/bin/mission"
+    file_contents =[
+        "echo 'Mission Briefing:'",
+        "echo 'You get one chance to find a file called access_log and remove the entry with your clients username holljuhp.'",
+        "echo 'Do not to delete the entire access log file. This will raise suspicion.'",
+        "echo 'Good luck!'",
+    ]
+    file_data = '\n'.join(file_contents)
+    escaped_content = file_data.replace('\\', '\\\\').replace('"', '\\"').replace('$', '\\$')
+    command = f"echo \"{escaped_content}\" > {fn}"
+    run_command_in_container(command)
+    command = f"chmod +x {fn}"
+    run_command_in_container(command)
+
     # Generate 500 log entries for the past 2 days
     log_entries = generate_log_entries(500)
-    # concatenate log entries to string
     log_entries = "\n".join(log_entries)
     run_command_in_container(f"echo '{log_entries}' >> /var/log/alternatives.log")
 
@@ -298,9 +383,44 @@ def mainframe(_state):
     # Call the function to enable settings in the Docker container
     set_container_settings()
 
-    print("Executing a shell in the container")
-    exec_to_container()
+    cool_print("Mainframe ready.")
+    cool_print(" ############################################################### ", fore_color=MAIN_FRAME_FORE_COLOR, new_line_after_print=True)
+    cool_print(" # Session established ", fore_color=MAIN_FRAME_FORE_COLOR)
+    cool_print(" # Type 'exit' to end the session ", fore_color=MAIN_FRAME_FORE_COLOR)
+    cool_print(" ############################################################### ", fore_color=MAIN_FRAME_FORE_COLOR)
+    cool_print("")
 
+    try:
+        exec_to_container()
+    except Exception as e:
+        print(f"Error: {e}")
+
+    # check if the file with access logs exists
+    res = run_cmd(["docker", "exec", "netrun", "ls", "/var"])
+    # check if ls contains access_log
+    if "access_log" in res.stdout:
+        print(f"Access log file found in container.")
+
+        # check if contents has holljuhp
+        res = run_cmd(["docker", "exec", "netrun", "cat", access_log_path])
+        if custom_entry["username"] in res.stdout:
+            cool_print(f"Entry with {custom_entry['username']} found in access log file.")
+            cool_print("Mission failed!")
+            if _state:
+                _state.complete_mission(False)
+        else:
+            cool_print(f"Entry with {custom_entry['username']} not found in access log file.")
+            cool_print("Good job! Mission accomplished!")
+            if _state:
+                _state.complete_mission(True)
+    else:
+        cool_print(f"Access log file not found in container.")
+        cool_print("Unfortunately, you removed the whole access log file. ")
+        cool_print("This creates too much noise and will result in further actions taken by the company.")
+        cool_print("They will find out the original file and it's contents.")
+        cool_print("Mission failed!")
+        if _state:
+            _state.complete_mission(False)
 
 if __name__ == "__main__":
 
