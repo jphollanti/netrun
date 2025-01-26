@@ -47,6 +47,8 @@ def competing_netrunner(_state):
     cool_print("And exhale.")
     cool_print("Per netrunner etiquette, you don't have a choice.")
     cool_print("You give your job ID.")
+    cool_print("")
+    cool_print("")
 
     # is he/she friendly?
     friendly = random.choice([True, False])
@@ -67,7 +69,10 @@ def competing_netrunner(_state):
     else: 
         cool_print("Bad news. You are on the same job.")
         cool_print("You both curse your employer as you scramble to your deck.")
-        
+        cool_print("")
+        cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
+        input()
+        cool_print("")
         cool_print("TBD: Implement competing netrunner actions.")
         cool_print("Press any key to continue.")
         input()
