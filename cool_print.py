@@ -7,6 +7,7 @@ from typing import Any, Callable, Dict, Optional
 from colorama import init, Fore, Style
 from typing import List
 import string
+from time import sleep
 
 # Initialize colorama for cross-platform colored output
 init(autoreset=True)
@@ -149,6 +150,10 @@ def default_delay_provider(line_length, nth_character:int) -> List[float]:
 
 
 def min_delay_provider(x, y):
+    return [0.003, 0.01, 0.0003, 0.001]
+
+
+def row_delay_provider(x, y):
     return [0.003, 0.01, 0.0003, 0.001]
 
 
@@ -315,37 +320,50 @@ def cool_print(
         event = Event(scheduled_time=replacement_time, action=action)
         heapq.heappush(event_queue, event)
     
-    # Schedule placeholder additions sequentially with a small delay between them
-    for index, char in enumerate(text):
-        _, _, placeholder_lower_delay, placeholder_upper_delay = delay_provider(len(current_chars), index)
+    if delay_provider == row_delay_provider:
+        style = Style.NORMAL
+        display_str = f"{style}"
+        for idx, char in enumerate(text):
+            color = color_map.get(idx, fore_color) if color_map else fore_color
+            display_str += f"{color}{char}"
+
+        file.write(display_str)
+        file.flush()
+        _, _, placeholder_lower_delay, placeholder_upper_delay = delay_provider(len(current_chars), 0)
         placeholder_delay = generate_bell_curve_delay(placeholder_lower_delay, placeholder_upper_delay, z)
-        scheduled_time = start_time + index * placeholder_delay
-        def action(index=index, char=char):
-            nonlocal active_replacements
-            # Add placeholder
-            add_placeholder(index, char)
-            # Increment active replacements
-            active_replacements += 1
-            # If over concurrency limit, move the next replacement event to replace_queue
-            if active_replacements > max_concurrent:
-                if event_queue:
-                    event = heapq.heappop(event_queue)
-                    replace_queue.append(event)
-                    active_replacements -= 1
-        event = Event(scheduled_time=scheduled_time, action=action)
-        heapq.heappush(event_queue, event)
-    
-    # Main loop to process events
-    while event_queue or replace_queue:
-        if hide_cursor:
-            file.write(HIDE_CURSOR)
-            file.flush()
-        current_time = time.time()
-        while event_queue and event_queue[0].scheduled_time <= current_time:
-            event = heapq.heappop(event_queue)
-            event.action()
-        # Sleep for a short duration to prevent high CPU usage
-        time.sleep(0.01)  # 10ms
+        sleep(placeholder_delay)
+    else:
+        # Schedule placeholder additions sequentially with a small delay between them
+        for index, char in enumerate(text):
+            _, _, placeholder_lower_delay, placeholder_upper_delay = delay_provider(len(current_chars), index)
+            placeholder_delay = generate_bell_curve_delay(placeholder_lower_delay, placeholder_upper_delay, z)
+            scheduled_time = start_time + index * placeholder_delay
+            def action(index=index, char=char):
+                nonlocal active_replacements
+                # Add placeholder
+                add_placeholder(index, char)
+                # Increment active replacements
+                active_replacements += 1
+                # If over concurrency limit, move the next replacement event to replace_queue
+                if active_replacements > max_concurrent:
+                    if event_queue:
+                        event = heapq.heappop(event_queue)
+                        replace_queue.append(event)
+                        active_replacements -= 1
+            event = Event(scheduled_time=scheduled_time, action=action)
+            heapq.heappush(event_queue, event)
+
+        # Main loop to process events
+        while event_queue or replace_queue:
+            if hide_cursor:
+                file.write(HIDE_CURSOR)
+                file.flush()
+            current_time = time.time()
+            while event_queue and event_queue[0].scheduled_time <= current_time:
+                event = heapq.heappop(event_queue)
+                event.action()
+            # Sleep for a short duration to prevent high CPU usage
+            time.sleep(0.001)  # 10ms
     
     if hide_cursor:
         file.write(SHOW_CURSOR)

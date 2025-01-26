@@ -16,6 +16,7 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, parent_dir)
 from cool_print import cool_print
 from cool_print import min_delay_provider
+from cool_print import row_delay_provider
 
 # Initialize Colorama
 init(autoreset=True)
@@ -89,7 +90,7 @@ def place_pattern_plus_key(table, pattern, key):
 
 def print_table(table, sel_row, sel_col, 
                 color_normal, color_selected, color_search,
-                highlights=None):
+                highlights=None, very_fast_print=False):
     """
     Print the table with row coloring.  
     - We have `rows` x `cols` cells, no ID column.  
@@ -106,7 +107,8 @@ def print_table(table, sel_row, sel_col,
     header = "       "
     for c in range(cols):
         header += f"{c:^10}"
-    cool_print(header, fore_color=DATA_CORE_COLOR, delay_provider=min_delay_provider)
+    dp = row_delay_provider if very_fast_print else min_delay_provider
+    cool_print(header, fore_color=DATA_CORE_COLOR, delay_provider=dp)
 
     # Print each row
     for r in range(rows):
@@ -136,7 +138,7 @@ def print_table(table, sel_row, sel_col,
                 #row_str += f"{color_normal}{cell_val:^10}{Style.RESET_ALL}"
                 row_str += f"{cell_val:^10}"
 
-        cool_print(row_str, color_map=color_map, fore_color=DATA_CORE_COLOR, delay_provider=min_delay_provider)
+        cool_print(row_str, color_map=color_map, fore_color=DATA_CORE_COLOR, delay_provider=dp)
     cool_print()
 
 def hex_to_ascii(hex_value):
@@ -204,27 +206,35 @@ def restore_console_output(saved_text):
 
 
 def data_core(state):
+
+    pattern = ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", k=3))
+    key = ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", k=4))
     
     def delay_provider(x, y):
         return [0.03, 0.1, 0.003, 0.01]
     
     cool_print("You are at the Data Core!", delay_provider=delay_provider, state=state)
     cool_print("In the empty virtual space air seems to hum contently.", delay_provider=min_delay_provider, state=state)
-    cool_print("Trillions inputs per second are carefully archived in the belly of this magnificent beast.", delay_provider=min_delay_provider, state=state)
+    cool_print("Trillions inputs per second are carefully archived in the belly of this beast.", delay_provider=min_delay_provider, state=state)
     cool_print("The Data Core is the heart of the system, where all the information is stored.", delay_provider=min_delay_provider, state=state)
     cool_print("")
     cool_print("As you venture deeper into the empty space, small blinking lights pass you by.", delay_provider=min_delay_provider, state=state)
     cool_print("You know these are access points into specific data shard.", delay_provider=min_delay_provider, state=state)
     cool_print("Your client has equipped you with sensing software to find the right shard.", delay_provider=min_delay_provider, state=state)
-    cool_print("The lights are cyan, but one blinks magenta. That's the one!", delay_provider=min_delay_provider, state=state)
+    cool_print("The blinking lights are all cyan, but one blinks magenta. That's the one!", delay_provider=min_delay_provider, state=state)
     cool_print("You approach the magenta light and touch it.", delay_provider=min_delay_provider, state=state)
+    cool_print(".  ", delay_provider=min_delay_provider, state=state, end='')
+    cool_print(".. ", delay_provider=min_delay_provider, state=state, end='')
+    cool_print("...", delay_provider=min_delay_provider, state=state)
+    cool_print("")
     cool_print("You are enveloped in deep magenta space.", delay_provider=min_delay_provider, state=state)
     cool_print("A hex grid appears in front of you.", delay_provider=min_delay_provider, state=state)
     cool_print("")
-    cool_print("Your client has equipped you with 3 search string.", delay_provider=min_delay_provider, state=state)
+    cool_print(f"Your client has equipped you with 3 letter search string: {pattern}.", delay_provider=min_delay_provider, state=state)
     cool_print("You can use it find starting point for the key you need to extract.", delay_provider=min_delay_provider, state=state)
-    cool_print("For example, if the search string is 'PUZ', and the key is 'ABCD',", delay_provider=min_delay_provider, state=state)
-    cool_print("you would first find the starting point and then four consecutive cells that comprise the key.", delay_provider=min_delay_provider, state=state)
+    cool_print("")
+    cool_print("For example, if the search string is 'PUZ', you would first find PUZ ƒrom the hex grid.", delay_provider=min_delay_provider, state=state)
+    cool_print("You would then check the consecutive four cells that comprise the key.", delay_provider=min_delay_provider, state=state)
     cool_print("")
     cool_print("You can move around the hex grid using arrow keys.", delay_provider=min_delay_provider, state=state)
     cool_print("Press Enter to see the ASCII value of the hex cell you are on.", delay_provider=min_delay_provider, state=state)
@@ -263,9 +273,6 @@ def data_core(state):
     # "fresh" screen
     os.system("cls" if os.name == "nt" else "clear")
 
-    pattern = ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", k=3))
-    key = ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", k=4))
-
     table = generate_table(ROW_COUNT, COL_COUNT)
 
     # Place pattern+key
@@ -279,6 +286,9 @@ def data_core(state):
     instructions = f"Press arrow keys to move, Enter=show ASCII, S=search, V=validate key, Q=quit."
 
     message = ""
+
+    very_fast_print = False
+
     while True:
         # Clear screen each frame
         os.system("cls" if os.name == "nt" else "clear")
@@ -290,10 +300,14 @@ def data_core(state):
         print_table(
             table, selected_row, selected_col,
             color_normal, color_selected, color_search,
-            highlights
+            highlights,
+            very_fast_print
         )
         if message:
             print(message)
+
+        # print slow only first time
+        very_fast_print = True
 
         ch = getch.getch()
         if ch == '\x1b':  # ESC for arrow keys
@@ -304,19 +318,35 @@ def data_core(state):
             elif arrow == 'B':  # Down
                 selected_row = (selected_row + 1) % ROW_COUNT
             elif arrow == 'D':  # Left
-                selected_col = (selected_col - 1) % COL_COUNT
+                selected_col = selected_col - 1
             elif arrow == 'C':  # Right
-                selected_col = (selected_col + 1) % COL_COUNT
-
+                selected_col = selected_col + 1
+            
+            # Wrap around
+            if selected_col < 0:
+                if selected_row > 0:
+                    selected_col = COL_COUNT - 1
+                    selected_row = selected_row - 1
+                else:
+                    # keep selection where it is if already at start
+                    selected_col = 0
+            if selected_col >= COL_COUNT:
+                if selected_row < ROW_COUNT - 1:
+                    selected_col = 0
+                    selected_row = selected_row + 1
+                else:
+                    # keep selection where it is if already at end
+                    selected_col = COL_COUNT - 1
+            
         elif ch in ('\r', '\n'):  # Enter => show ASCII
             hex_val = table[selected_row][selected_col]
             message = hex_to_ascii(hex_val)
 
         elif ch.lower() == 's':
-            print(f"{Fore.CYAN}Enter an ASCII string to search:")
+            print(f"{DATA_CORE_COLOR}Enter an ASCII string to search:")
             search_string = input("> ").strip()
             if not search_string:
-                message = f"{Fore.RED}Search string cannot be empty!"
+                message = f"{DATA_CORE_COLOR}Search string cannot be empty!"
             else:
                 search_hex = [f"0x{ord(c):02X}" for c in search_string]
                 # Flatten the table to find them
@@ -337,29 +367,54 @@ def data_core(state):
                             col_ = idx % COL_COUNT
                             highlights.add((row_, col_))
                 if found:
-                    message = f"{Fore.GREEN}Matches highlighted."
+                    message = f"{DATA_CORE_COLOR}Matches highlighted."
                 else:
-                    message = f"{Fore.RED}No match found for '{search_string}'."
+                    message = f"{DATA_CORE_COLOR}No match found for '{search_string}'."
 
         elif ch.lower() == 'q':
-            print(f"{Fore.RED}Exiting the program. Goodbye!")
+            print(f"{DATA_CORE_COLOR}Exiting data core...")
             break
 
         elif ch.lower() == 'v':
-            key_str = input(f"{Fore.CYAN}Enter a 4-character uppercase/digit key: ").strip()
+            key_str = input(f"{DATA_CORE_COLOR}Enter a 4-character uppercase/digit key: ").strip()
             # compare with the current key
             if key_str == key:
-                message = f"{Fore.GREEN}Key is correct! Key is: {key}. Remember it!"
-                state.complete_mission(False)
-                return 1
+                message = f"{DATA_CORE_COLOR}Key is correct! Key is: {key}. Remember it!"
             else:
                 tries -= 1
                 if tries == 0:
-                    print(f"{Fore.RED}Out of tries. Game over.")
+                    print(f"{DATA_CORE_COLOR}Out of tries. Game over.")
                     state.complete_mission(False)
                     return -1
-                message = f"{Fore.RED}Key is incorrect! Try again. Tries remaining: {tries}."
+                message = f"{DATA_CORE_COLOR}Key is incorrect! Try again. Tries remaining: {tries}."
         # else: do nothing for other keys
+    
+    cool_print("")
+    cool_print("")
+    cool_print(" ----------------------------------------------------------------- ", delay_provider=min_delay_provider, state=state)
+    cool_print("You have exited the Data Core.", delay_provider=min_delay_provider, state=state)
+    cool_print(".   ", delay_provider=min_delay_provider, state=state, end='')
+    cool_print("..  ", delay_provider=min_delay_provider, state=state, end='')
+    cool_print("... ", delay_provider=min_delay_provider, state=state, end='')
+    cool_print("....", delay_provider=min_delay_provider, state=state, end='')
+    cool_print("Your head swoons as you exit the magenta space.", delay_provider=min_delay_provider, state=state,)
+    cool_print("You feel nauseous for a split second.", delay_provider=min_delay_provider, state=state)
+    cool_print("In cyber space it feels like hours.", delay_provider=min_delay_provider, state=state)
+    cool_print("")
+    cool_print("You are back in the empty virtual space.", delay_provider=min_delay_provider, state=state)
+    cool_print("You taste metal.", delay_provider=min_delay_provider, state=state)
+    cool_print("")
+    cool_print("In the empty space, the magenta shard still remains.", delay_provider=min_delay_provider, state=state)
+    cool_print("Below it blinks an empty cursor.", delay_provider=min_delay_provider, state=state)
+    cool_print("Input the 4-character key to extract the data.", delay_provider=min_delay_provider, fore_color=Fore.YELLOW, state=state)
+    cool_print("")
+    try_key = input("> ")
+    if try_key.strip() == key:
+        cool_print("You have successfully extracted the data!", delay_provider=min_delay_provider, state=state)
+        state.complete_mission(True)
+    else:
+        cool_print("The key is incorrect. Mission failed.", delay_provider=min_delay_provider, state=state)
+        state.complete_mission(False)
 
 
 def main():
