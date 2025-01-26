@@ -156,6 +156,12 @@ class MainState:
         cool_print("Mission complete")
         cool_print("Success" if success else "Failure")
         cool_print("Game over")
+    
+    def receive_program(self):
+        cool_print("Program received")
+    
+    def lose_program(self):
+        cool_print("Program lost")
 
 def get_sections_of_path(path):
     """
