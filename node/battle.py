@@ -62,23 +62,38 @@ def battle(player, opponent, state):
             opponent['health'] -= damage
         
         def opponent_turn(player, opponent):
-            cool_print(f"The {opponent['name']}'s turn to attack you.")
+            cool_print(f"It's the {opponent['name']}'s turn.")
 
-            attack = random.choice(opponent['actions'])
+            action = random.choice(opponent['actions'])
 
-            lines = break_to_lines(attack['effect'])
+            lines = break_to_lines(action['description'])
             for line in lines:
                 cool_print(line)
             cool_print()
 
-            cool_print(f"{opponent['name']} rolls for damage.")
-            cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
-            input()
-            damage = attack['roll']()
-            cool_print(f"The {opponent['name']} deals " + str(damage) + " damage to you.")
-            player['health'] -= damage
+            if action['type'] == 'damage':
+                cool_print(f"{opponent['name']} rolls for damage.")
+                cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
+                input()
+                damage = action['roll']()
+                cool_print(f"The {opponent['name']} deals " + str(damage) + " damage to you.")
+                player['health'] -= damage
 
-            #cool_print(f"{opponent['name']}'s attack has a special effect.")
+                # TODO: cool_print(f"{opponent['name']}'s attack has a special effect.")
+            elif action['type'] == 'alert':
+                succ = action['attempt'](state)
+                if succ:
+                    cool_print(action['action_txt'])
+                    cool_print("")
+                    cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
+                    input()
+                    action['effect']()
+                    opponent['health'] = 0
+                else:
+                    cool_print(action['fail_txt'])
+                    cool_print("")
+                    cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
+                    input()
         
         def game_over(opponent):
             cool_print(f"You are defeated by the {opponent['name']}.")

@@ -18,11 +18,31 @@ white_ice_programs = [
     {
         "id": "netwatch_scout",
         "name": "Netwatch Scout",
-        "effect": "Detects unauthorized activity and raises an alarm.",
-        "damage": "None",
+        "greeting": lambda _player: f"""
+        Detects unauthorized activity and raises an alarm.
+        You need to eliminate it before it alerts the defenders. 
+        """, 
+        "damage": lambda: 0,
         "special": "Summons Black ICE or alerts defenders",
         "health": 10, 
-        "action": lambda _state: netwatch_scout_action(_state)
+        "initiative": lambda: random.randint(1, 100) - 30,
+        "actions": [
+          {
+            "name": "Raise Alarm",
+            "type": "alert",
+            "description": """Raises an alarm and summons Black ICE or alerts defenders.""",
+            "attempt": lambda _state: random.randint(1, 100) > 75,
+            "action_txt": """
+            The Netwatch Scout detects your intrusion and raises an alarm.
+            Black ICE programs are summoned to your location.
+            """,
+            "fail_txt": """
+            The Netwatch Scout looks confused.
+            It fails to detect your intrusion in this turn.
+            """,
+            "effect": lambda _state: black_ice.black_ice(_state),
+          }
+        ]
     },
     {
       "id": "gatekeeper",
@@ -70,28 +90,6 @@ white_ice_programs = [
         "action": lambda _state: tracer_action(_state)
     }
   ]
-
-def netwatch_scout_action(_state):
-    cool_print("The Netwatch Scout tries to detect your intrusion.")
-    cool_print("Roll a 1d6 to determine the outcome. On 5 and 6 you are detected.")
-    cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
-    input()
-    roll = random.randint(1, 6)
-    cool_print("You rolled a " + str(roll) + ".")
-    cool_print("")
-    if roll > 4:
-      cool_print("The Netwatch Scout detects your intrusion and raises an alarm.")
-      cool_print("Black ICE programs are summoned to your location.")
-      cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
-      input()
-      cool_print("")
-      black_ice.black_ice(_state)
-    else:
-      cool_print("The Netwatch Scout fails to detect your intrusion.")
-      cool_print("You proceed further in your mission.")
-      _state.complete_node()
-      cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
-      input()
 
 def gatekeeper_action(_state):
     cool_print("The Gatekeeper program imposes additional checks and encryption layers.")

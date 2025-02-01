@@ -30,7 +30,8 @@ black_ice_programs = [
       "actions": [
         {
           "name": "Fry",
-          "effect": """Deals 2d6 physical damage directly to the Netrunner. 
+          "type": "damage",
+          "description": """Deals 2d6 physical damage directly to the Netrunner. 
           They also take additional 2 damage per turn until the end of the encounter.""",
           "roll": lambda: random.randint(1, 6) + random.randint(1, 6),
           "residual": lambda _state: 2,
@@ -48,7 +49,10 @@ black_ice_programs = [
       "actions": [
         {
           "name": "Corrupt",
-          "effect": """Deals 2d6 damage to the Netrunner's. Additionally may destroy netrunners programs.""",
+          "type": "damage",
+          "description": """Deals 2d6 damage to the Netrunner's. Additionally may destroy netrunners programs.""",
+          "successful_action": lambda _state: True,
+          "successful_action_txt": "",
           "roll": lambda: random.randint(1, 6) + random.randint(1, 6),
           "residual": lambda state: state.destroy_programs() if random.choice([True, False]) else 0,
           "special": "Program destruction"
@@ -66,7 +70,10 @@ black_ice_programs = [
       "actions": [
         {
           "name": "Stun",
-          "effect": """Deals damage in the virtual world, resulting in 1d6 physical damage.""",
+          "type": "damage",
+          "description": """Deals damage in the virtual world, resulting in 1d6 physical damage.""",
+          "successful_action": lambda _state: True,
+          "successful_action_txt": "",
           "roll": lambda: random.randint(1, 6),
           "residual": lambda state: state.stun() if random.choice([True, False]) else 0,
           "special": "Stuns the netrunner"
