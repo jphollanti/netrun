@@ -12,6 +12,7 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, parent_dir)
 from cool_print import cool_print
 
+from . import battle
 
 white_ice_programs = [
     {
@@ -224,11 +225,4 @@ def white_ice(_state):
 
     ice = random.choice(white_ice_programs)
 
-    cool_print("You encounter a " + ice['name'] + " - a White ICE program.", new_line_after_print=True)
-    cool_print("Effect: " + ice['effect'])
-
-    cool_print("")
-    cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
-    input()
-    cool_print("")
-    ice['action'](_state)
+    battle.battle(_state._state['player'], ice, _state)
