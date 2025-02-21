@@ -58,7 +58,7 @@ def battle(player, opponent, state):
             cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
             input()
             damage = random.randint(1, 10) + random.randint(1, 10) + random.randint(1, 10)
-            cool_print("You deal " + str(damage) + " damage to the Hellhound.")
+            cool_print("You deal " + str(damage) + " damage to the " + opponent['name'] + ".")
             opponent['health'] -= damage
         
         def opponent_turn(player, opponent):
@@ -107,7 +107,7 @@ def battle(player, opponent, state):
                 break
             
             cool_print("Player Health: ", player['health'])
-            cool_print("Hellhound Health: ", opponent['health'])
+            cool_print(opponent['name'] + " Health: ", opponent['health'])
 
             if player_initiative > opponent_initiative:
                 player_turn(player, opponent)
