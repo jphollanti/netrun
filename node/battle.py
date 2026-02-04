@@ -3,6 +3,7 @@ from colorama import Fore, Back, Style, init
 import node.node as node
 import os
 import sys
+from enum import Enum, auto
 
 # Import cool_print from parent directory
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -12,12 +13,57 @@ sys.path.insert(0, parent_dir)
 from cool_print import cool_print
 
 
+# 
+# Logic:
+# 
+# Player and opponent have actions that they play on their turn. Player has a deck of additional
+# actions. 
+# 
+# Player and opponent have health. Player and opponent have initiative.
+#
+# When an action is taken against a player or opponent, the action will be added to 
+# the effects log. The effects log is processed in order when it's player's turn. 
+# 
+# Some actions need to be immediate, like damage. 
+#
+# All actions need to have a type because some actions can be counteracted by other actions.
+#
+# For example, if a player is struck by a worm, they can use an antivirus action to remove the worm.
+# The end result is that the effect of the worm is nullified. 
+# 
+# The effect log is ordered based on turns. For example, if a player is struck by an action
+# that causes damage over time, the effect will be added to the effect log and processed on 
+# the player's turn.
+#
+# If the action is stun instead of damage, the player will lose their next turn.
+# 
+
+class ActionType(Enum):
+    DAMAGE = auto()
+    ALERT = auto()
+    HEAL = auto()
+    STUN = auto()
+
+
+class Action:
+    def __init__(self, whodunnit, type, description, roll, attempt, effect, action_txt, fail_txt):
+        self.whodunnit = whodunnit
+        self.type = type
+        self.description = description
+        self.roll = roll
+        self.attempt = attempt
+        self.effect = effect
+        self.action_txt = action_txt
+        self.fail_txt = fail_txt
+
+
 def break_to_lines(text):
     # Split into lines, removing leading/trailing blank lines:
     lines = text.strip().splitlines()
     # Remove leading spaces from each line:
     lines = [line.lstrip() for line in lines]
     return lines
+
 
 def battle(player, opponent, state): 
     lines = break_to_lines(opponent['greeting'](player))
@@ -76,6 +122,16 @@ def battle(player, opponent, state):
                 cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
                 input()
                 damage = action['roll']()
+                _a = Action(
+                    opponent['name'], 
+                    ActionType.DAMAGE, 
+                    "The opponent deals damage to you.", 
+                    action['roll'], 
+                    action['attempt'], 
+                    action['effect'], 
+                    action['action_txt'], 
+                    action['fail_txt'])
+                action_log.append(_a)
                 cool_print(f"The {opponent['name']} deals " + str(damage) + " damage to you.")
                 player['health'] -= damage
 
@@ -99,6 +155,8 @@ def battle(player, opponent, state):
             cool_print(f"You are defeated by the {opponent['name']}.")
             cool_print("Game Over.")
             exit()
+        
+        action_log = []
 
         while (True): 
             if player['health'] <= 0:
