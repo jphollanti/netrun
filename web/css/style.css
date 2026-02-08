@@ -1,0 +1,119 @@
+/* ── reset & base ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg:       #0a0a0f;
+  --fg:       #b0ffb0;
+  --accent:   #00ff88;
+  --dim:      #1a1a2e;
+  --bar-bg:   #0d0d15;
+  --bar-border: #00ff8844;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Courier New", "Consolas", monospace;
+  overflow: hidden;
+}
+
+/* ── CRT scanline overlay ─────────────────────────────────────── */
+#scanlines {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+}
+
+/* ── top bar ──────────────────────────────────────────────────── */
+#top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px;
+  background: var(--bar-bg);
+  border-bottom: 1px solid var(--bar-border);
+  height: 36px;
+  z-index: 10;
+  position: relative;
+}
+
+.logo {
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--accent);
+}
+
+.status {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #888;
+  text-transform: uppercase;
+}
+
+.status.online {
+  color: var(--accent);
+  text-shadow: 0 0 4px var(--accent);
+}
+
+.status.offline {
+  color: #ff4444;
+}
+
+/* ── terminal container ───────────────────────────────────────── */
+#terminal-container {
+  position: absolute;
+  top: 36px;      /* below top-bar */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 8px;
+  background: var(--bg);
+}
+
+#terminal {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── xterm overrides for theme consistency ─────────────────────── */
+.xterm {
+  padding: 4px;
+}
+
+.xterm-viewport::-webkit-scrollbar {
+  width: 6px;
+}
+
+.xterm-viewport::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+
+/* ── subtle vignette ──────────────────────────────────────────── */
+body::after {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.5) 100%);
+  z-index: 999;
+}

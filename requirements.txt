@@ -1,2 +1,4 @@
 colorama
 getch
+flask
+flask-sock
