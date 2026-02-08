@@ -32,6 +32,7 @@ white_ice_programs = [
             It fails to detect your intrusion in this turn.
             """,
             "effect": lambda _state: black_ice.black_ice(_state),
+            "ends_battle": True,
           }
         ]
     },

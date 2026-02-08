@@ -183,7 +183,9 @@ def battle(player, opponent, state):
                     cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
                     input()
                     action['effect'](state)
-                    opponent['health'] = 0
+                    # Some alerts end the fight (e.g., Netwatch Scout summons Black ICE)
+                    if action.get('ends_battle', False):
+                        opponent['health'] = 0
                 else:
                     cool_print(action['fail_txt'])
                     cool_print("")
