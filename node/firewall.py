@@ -1,13 +1,5 @@
 import random
-import sys
-import os
 from colorama import Fore
-
-# Import cool_print from parent directory
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
-# Insert the parent directory at the beginning of sys.path
-sys.path.insert(0, parent_dir)
 from cool_print import cool_print
 
 def firewall(_state): 
@@ -34,7 +26,7 @@ def firewall(_state):
             cool_print("You proceed further in your mission.")
             _state.complete_node()
             cool_print("Press any key to continue.")
-            input
+            input()
     elif choice == '2':
         cool_print("You successfully escape.")
         exit(0)

@@ -1,13 +1,5 @@
-import sys
-import os
 from colorama import Fore
 import time
-
-# Import cool_print from parent directory
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
-# Insert the parent directory at the beginning of sys.path
-sys.path.insert(0, parent_dir)
 from cool_print import cool_print
 
 

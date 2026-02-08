@@ -240,6 +240,30 @@ def generate_new_state(width, height, waypoints_number):
     return route
 
 
+def get_sections_of_path(path):
+    """
+    Since paths are always at max a set of two blocks, get from path length two continuous sections of the path
+    """
+    sections = []
+    direction = None
+    count = 0
+    for step in path:
+        if direction is None:
+            direction = step['direction']
+            count = 1
+        elif step['direction'] == direction:
+            count += 1
+        elif step['direction'] != direction:
+            sections.append(count)
+            direction = step['direction']
+            count = 0
+
+    if count > 0:
+        sections.append(count)
+
+    return sections
+
+
 def main():
     width = 10
     height = 10

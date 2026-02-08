@@ -4,19 +4,12 @@ from colorama import Fore, Back, Style, init
 import getch
 import subprocess
 import sys
-import os
 import time
-
-DATA_CORE_COLOR = Fore.RED
-
-# Import cool_print from parent directory
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
-# Insert the parent directory at the beginning of sys.path
-sys.path.insert(0, parent_dir)
 from cool_print import cool_print
 from cool_print import min_delay_provider
 from cool_print import row_delay_provider
+
+DATA_CORE_COLOR = Fore.RED
 
 # Initialize Colorama
 init(autoreset=True)
