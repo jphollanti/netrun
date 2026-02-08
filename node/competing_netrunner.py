@@ -1,17 +1,9 @@
 import time
 import random
-import random
-import sys
-import os
 from colorama import Fore
-from . import battle
-
-# Import cool_print from parent directory
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
-# Insert the parent directory at the beginning of sys.path
-sys.path.insert(0, parent_dir)
 from cool_print import cool_print
+
+from . import battle
 
 
 netrunner = {
@@ -118,7 +110,7 @@ def competing_netrunner(_state):
     cool_print("A faint transparent cloud on a clear sky.")
     cool_print("Then it begins to grow... and grow.")
     cool_print("It takes form in a split second. You see another netrunner.")
-    heshe = 'He' if gender == 'male' else 'She'
+    heshe = 'He' if gender == 'Male' else 'She'
     cool_print(f"{heshe} gives you a short smile. ")
     cool_print("You both understand what's about to transpire.")
     cool_print("With luck you can ignore each other. But, if you're on the same mission...")
@@ -126,12 +118,12 @@ def competing_netrunner(_state):
     cool_print("And the other one must bow out.")
     cool_print("You have seen each other. You cannot ignore each other.")
     cool_print("")
-    if gender == 'female':
+    if gender == 'Female':
         cool_print("This is not her real appearance. But it is a good approximation of her.")
         cool_print("You identify a person here, you identify a person outside.")
         cool_print("She's pretty. Young. Maybe 20s. Maybe 30s. Short blonde hair with neon highlights.")
         cool_print("She's wearing a black leather jacket. Blue eyes. A bit of a smirk.")
-    if gender == 'male':
+    if gender == 'Male':
         cool_print("This is not his real appearance. But it is a good approximation of him.")
         cool_print("You identify a person here, you identify a person outside.")
         cool_print("He's tall. Maybe 30s. Maybe 40s. Black hair with neon highlights.")
@@ -150,16 +142,15 @@ def competing_netrunner(_state):
     cool_print("")
     cool_print("")
 
-    # is he/she friendly?
-    friendly = random.choice([True, False])
-    friendly = False
+    # is he/she friendly? 70% chance friendly, 30% hostile
+    friendly = random.random() < 0.7
     if friendly:
         cool_print("Good news. You are not on the same job.")
         cool_print("You both nod at each other.")
         cool_print(f"{heshe} smiles a crooked smile. 'Good luck. Here, have this.'")
         cool_print(f"{heshe} sends you a file. It's a program.")
         cool_print("You nod back. 'Thanks. Take this.'")
-        himher = 'him' if gender == 'male' else 'her'
+        himher = 'him' if gender == 'Male' else 'her'
         cool_print(f"You send one of your program's back to {himher}.")
         cool_print("Another netrunner protocol. If you part as friends, share your programs.")
         cool_print("This way, if either of you rat the other one out,")

@@ -60,7 +60,7 @@ def main():
             elif choice == 'c':
                 # get from path length of two continuous sections of the path
                 path = rloc['path']
-                sections = state.get_sections_of_path(path)
+                sections = levelgen.get_sections_of_path(path)
                 
                 # remove sections with length less than 2
                 sections = [s for s in sections if s > 1]

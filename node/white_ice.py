@@ -1,17 +1,8 @@
 import random
-from . import black_ice
-
-import sys
-import os
 from colorama import Fore
-
-# Import cool_print from parent directory
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
-# Insert the parent directory at the beginning of sys.path
-sys.path.insert(0, parent_dir)
 from cool_print import cool_print
 
+from . import black_ice
 from . import battle
 
 white_ice_programs = [
@@ -130,6 +121,7 @@ def watchdog_action(_state):
         cool_print("The Watchdog program catches your scent and follows you around.")
         cool_print("It jumps to assist any Black ICE programs you may encounter.")
         _state.watch_dogged()
+        _state.complete_node()
         cool_print("You have passed this node.")
         cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
         input()
@@ -223,4 +215,11 @@ def white_ice(_state):
 
     ice = random.choice(white_ice_programs)
 
-    battle.battle(_state._state['player'], ice, _state)
+    # Netwatch Scout uses the battle system; all others use direct action handlers
+    if 'actions' in ice:
+        battle.battle(_state._state['player'], ice, _state)
+    else:
+        cool_print(f"You encounter a {ice['name']}.")
+        cool_print(ice['effect'])
+        cool_print("")
+        ice['action'](_state)

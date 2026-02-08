@@ -136,52 +136,59 @@ class MainState:
         self.store()
     
     def logged(self):
-        cool_print("Actions are being logged")
-    
-    def slow_down(self, roll):
-        cool_print("Slowed down")
-    
+        self._state['player']['logged'] = True
+        self.store()
+        cool_print("Your actions are now under scrutiny by the system defenders.")
+        cool_print("The intrusion attempt is logged and stored for post-intrusion analysis.")
+
+    def slow_down(self, turns):
+        self._state['player']['slowed'] = self._state['player'].get('slowed', 0) + turns
+        self.store()
+        cool_print(f"You are slowed down by {turns} turns.")
+
     def watch_dogged(self):
-        cool_print("Watch dogged")
-    
+        self._state['player']['watch_dogged'] = True
+        self.store()
+        cool_print("The Watchdog program catches your scent and follows you around.")
+        cool_print("It will assist any Black ICE programs you encounter.")
+
     def tracered(self):
-        cool_print("Tracered")
-    
+        self._state['player']['traced'] = True
+        self.store()
+        cool_print("The Tracer program has located your physical position.")
+        cool_print("You must deal with the consequences in the physical world.")
+
     def destroy_programs(self):
         self._state['player']['deck'] = []
         self.store()
-        cool_print("Programs destroyed")
-    
-    def complete_mission(self, success):
-        cool_print("Mission complete")
-        cool_print("Success" if success else "Failure")
-        cool_print("Game over")
-    
-    def receive_program(self):
-        cool_print("Program received")
-    
-    def lose_program(self):
-        cool_print("Program lost")
+        cool_print("All your programs have been destroyed!")
 
-def get_sections_of_path(path):
-    """
-    Since paths are always at max a set of two blocks, get from path length two continuous sections of the path
-    """
-    sections = []
-    direction = None
-    count = 0
-    for step in path:
-        if direction is None:
-            direction = step['direction']
-            count = 1
-        elif step['direction'] == direction:
-            count += 1
-        elif step['direction'] != direction:
-            sections.append(count)
-            direction = step['direction']
-            count = 0
-    
-    if count > 0:
-        sections.append(count)
-    
-    return sections
+    def complete_mission(self, success):
+        rloc = levelgen.get_current_route_loc(self._state['route'])
+        rloc['completed']['node'] = True
+        rloc['completed']['path'] = True
+        self.store()
+        cool_print("Mission complete!")
+        if success:
+            cool_print("You successfully completed the run. Well done, netrunner.")
+        else:
+            cool_print("The mission was a failure. Better luck next time.")
+
+    def receive_program(self):
+        import random as _random
+        program = _random.choice(player.deck_options)
+        self._state['player']['deck'].append(program)
+        self.store()
+        cool_print(f"You received a new program: {program['name']}.")
+        cool_print(f"  {program['effect']}")
+
+    def lose_program(self):
+        deck = self._state['player']['deck']
+        if deck:
+            import random as _random
+            lost = _random.choice(deck)
+            deck.remove(lost)
+            self.store()
+            cool_print(f"You lost the program: {lost['name']}.")
+        else:
+            cool_print("You have no programs to lose.")

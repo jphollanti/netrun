@@ -100,6 +100,10 @@ def new_player(name):
         'name': name,
         'health': 30,
         'stunned': 0,
+        'logged': False,
+        'slowed': 0,
+        'watch_dogged': False,
+        'traced': False,
         'deck': [
             random.choice(deck_options),
             random.choice(deck_options),
@@ -109,19 +113,3 @@ def new_player(name):
         ]
     }
     return player
-
-def slow_down(by):
-    print("You are slowed down by " + str(by) + " turns.")
-    return by
-
-def logged():
-    print("Your actions are now under scrutiny by the system defenders.")
-    print("The intrusion attempt is logged and stored for post-intrusion analysis.")
-    print("You are being monitored by the system defenders.")
-    return
-
-def watch_dogged():
-    print("Your actions are being monitored by the Watchdog program.")
-    print("It does not immediately attack, but it assists other ICE programs.")
-    print("You are being tracked by the system defenders.")
-    return

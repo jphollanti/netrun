@@ -1,18 +1,9 @@
 import time
 import random
-import node
-import sys
-import os
 from colorama import Fore
+from cool_print import cool_print
 
 from . import battle
-
-# Import cool_print from parent directory
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
-# Insert the parent directory at the beginning of sys.path
-sys.path.insert(0, parent_dir)
-from cool_print import cool_print
 
 black_ice_programs = [
     {
@@ -43,9 +34,10 @@ black_ice_programs = [
       "id": "raven",
       "name": "Raven",
       "greeting": lambda _player: f"""
-        Attacks the netrunner’s programs, destroying or disabling them.
+        Attacks the netrunner's programs, destroying or disabling them.
       """,
       "health": 25,
+      "initiative": lambda: random.randint(1, 100) + 5,
       "actions": [
         {
           "name": "Corrupt",

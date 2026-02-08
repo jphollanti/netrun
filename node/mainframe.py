@@ -8,13 +8,6 @@ import sys
 import string
 from datetime import datetime, timedelta
 import random
-from datetime import datetime, timedelta
-
-# Import cool_print from parent directory
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
-# Insert the parent directory at the beginning of sys.path
-sys.path.insert(0, parent_dir)
 from cool_print import cool_print
 from cool_print import min_delay_provider
 
