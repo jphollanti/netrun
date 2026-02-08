@@ -1,6 +1,4 @@
-import json
 import levelgen
-import logging
 from node import node
 import time
 import state
@@ -16,35 +14,8 @@ def main():
     cool_print("")
     play = True
     trace_turns_left = None
-    while (play):
-        # Traced countdown: once traced, the clock is ticking
-        if trace_turns_left is None and _state._state['player'].get('traced', False):
-            trace_turns_left = TRACE_COUNTDOWN
-            cool_print("")
-            cool_print("WARNING: A kill team has been dispatched to your physical location.", fore_color=Fore.RED)
-            cool_print(f"You have {trace_turns_left} turns to complete the mission or jack out.", fore_color=Fore.RED)
-            cool_print("")
-
-        if trace_turns_left is not None:
-            trace_turns_left -= 1
-            if trace_turns_left <= 0:
-                # Check if player has Cut and Run
-                deck = _state._state['player'].get('deck', [])
-                has_cut_and_run = any(c.get('id') == 'cut_and_run' for c in deck)
-                cool_print("")
-                cool_print("Time's up. The kill team has arrived at your physical location.", fore_color=Fore.RED)
-                if has_cut_and_run:
-                    cool_print("Your Cut and Run program activates -- emergency jack-out!", fore_color=Fore.YELLOW)
-                    cool_print("You barely escape with your life. Your body is gone from the chair by the time they breach the door.")
-                    cool_print("Mission failed, but you live to run another day.")
-                else:
-                    cool_print("You feel a searing pain as your body is disconnected from the real world.")
-                    cool_print("The kill team found your meat. Game over.")
-                play = False
-                continue
-            elif trace_turns_left <= 3:
-                cool_print(f"TRACE WARNING: {trace_turns_left} turns remaining!", fore_color=Fore.RED)
-
+    while play:
+        # Check for death first
         if _state._state['player']['health'] <= 0:
             cool_print(f"Your character {_state._state['player']['name']} is dead.")
             if _state._state['player']['health'] < -9:
@@ -66,10 +37,51 @@ def main():
             choice = input()
             if choice == 'y':
                 _state.delete_state()
+                _state._instance = None
+                _state = state.MainState()
                 _state.initialize()
-            play = False
+                trace_turns_left = None
+                continue
+            else:
+                play = False
+                continue
 
+        # Traced countdown: detect new trace
+        if trace_turns_left is None and _state._state['player'].get('traced', False):
+            trace_turns_left = TRACE_COUNTDOWN + 1  # +1 because we decrement below before first turn
+            cool_print("")
+            cool_print("WARNING: A kill team has been dispatched to your physical location.", fore_color=Fore.RED)
+            cool_print(f"You have {TRACE_COUNTDOWN} turns to complete the mission or jack out.", fore_color=Fore.RED)
+            cool_print("")
+
+        # Tick the trace countdown
+        if trace_turns_left is not None:
+            trace_turns_left -= 1
+            if trace_turns_left <= 0:
+                deck = _state._state['player'].get('deck', [])
+                has_cut_and_run = any(c.get('id') == 'cut_and_run' for c in deck)
+                cool_print("")
+                cool_print("Time's up. The kill team has arrived at your physical location.", fore_color=Fore.RED)
+                if has_cut_and_run:
+                    cool_print("Your Cut and Run program activates -- emergency jack-out!", fore_color=Fore.YELLOW)
+                    cool_print("You barely escape with your life. Your body is gone from the chair by the time they breach the door.")
+                    cool_print("Mission failed, but you live to run another day.")
+                else:
+                    cool_print("You feel a searing pain as your body is disconnected from the real world.")
+                    cool_print("The kill team found your meat. Game over.")
+                play = False
+                continue
+            elif trace_turns_left <= 3:
+                cool_print(f"TRACE WARNING: {trace_turns_left} turns remaining!", fore_color=Fore.RED)
+
+        # Check for win condition
         rloc = levelgen.get_current_route_loc(_state._state['route'])
+        if rloc is None:
+            _state.complete_mission(True)
+            play = False
+            continue
+
+        # Show map and location
         cool_print("Progress: ", state=_state)
         print("")
         levelgen.visualize(state.WIDTH, state.HEIGHT, _state._state['route'], rloc['node']['location'], state=_state)
@@ -80,6 +92,11 @@ def main():
             n = node.generate_node(rloc['node']['type'])
             n(_state)
         elif not rloc['completed']['path']:
+            # Last route entry (end node) has next=None, path is empty -- auto-complete it
+            if not rloc['path']:
+                _state.complete_path()
+                continue
+
             cool_print("You are at a path and you must choose to cross it or to escape.", state=_state)
             cool_print("Enter 'c' to cross the path or 'e' to escape: ", fore_color=Fore.YELLOW)
 
@@ -89,25 +106,29 @@ def main():
                 cool_print("You escaped the challenge and live to see another day.", state=_state)
                 play = False
             elif choice == 'c':
-                # get from path length of two continuous sections of the path
                 path = rloc['path']
                 sections = levelgen.get_sections_of_path(path)
-                
+
                 # remove sections with length less than 2
                 sections = [s for s in sections if s > 1]
-                #print("Sections: ", sections)
-                
+
+                if not sections:
+                    # Path too short for a puzzle, auto-cross
+                    cool_print("The path is short and clear. You cross without incident.", state=_state)
+                    _state.complete_path()
+                    continue
+
                 width = 10
                 height = 10
 
                 pieces = []
-                symbols = ['A', 'B',]
-                for s in sections: 
+                symbols = ['A', 'B']
+                for s in sections:
                     pieces.append({
                         'symbol': symbols.pop(0),
                         'length': s
                     })
-                
+
                 wander = 4
                 slowed = _state._state['player'].get('slowed', 0)
                 if slowed > 0:
@@ -126,12 +147,6 @@ def main():
                 else:
                     cool_print("You dead, try again", fore_color=Fore.YELLOW)
                     play = False
-        else:
-            # should not happen, die
-            logging.error("-----------------")
-            logging.error("Invalid state, exiting")
-            logging.error("-----------------")
-            exit(1)
 
 
 if __name__ == "__main__":
