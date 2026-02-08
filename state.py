@@ -170,7 +170,14 @@ class MainState:
         self.store()
         cool_print("Mission complete!")
         if success:
-            cool_print("You successfully completed the run. Well done, netrunner.")
+            if self._state['player'].get('logged', False):
+                cool_print("You completed the run... but your intrusion was logged.")
+                cool_print("The corp knows someone was in their system.")
+                cool_print("They'll be tightening security. And looking for you.")
+                cool_print("Not a clean run, but you got the data. Partial success.")
+            else:
+                cool_print("Clean run. No traces, no logs. Ghost in the machine.")
+                cool_print("You successfully completed the run. Well done, netrunner.")
         else:
             cool_print("The mission was a failure. Better luck next time.")
 

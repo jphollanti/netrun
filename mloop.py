@@ -8,12 +8,43 @@ import n_in_row
 from cool_print import cool_print
 from colorama import Fore
 
+TRACE_COUNTDOWN = 10  # turns before kill team arrives when traced
+
 def main():
     _state = state.MainState()
     _state.initialize()
     cool_print("")
     play = True
+    trace_turns_left = None
     while (play):
+        # Traced countdown: once traced, the clock is ticking
+        if trace_turns_left is None and _state._state['player'].get('traced', False):
+            trace_turns_left = TRACE_COUNTDOWN
+            cool_print("")
+            cool_print("WARNING: A kill team has been dispatched to your physical location.", fore_color=Fore.RED)
+            cool_print(f"You have {trace_turns_left} turns to complete the mission or jack out.", fore_color=Fore.RED)
+            cool_print("")
+
+        if trace_turns_left is not None:
+            trace_turns_left -= 1
+            if trace_turns_left <= 0:
+                # Check if player has Cut and Run
+                deck = _state._state['player'].get('deck', [])
+                has_cut_and_run = any(c.get('id') == 'cut_and_run' for c in deck)
+                cool_print("")
+                cool_print("Time's up. The kill team has arrived at your physical location.", fore_color=Fore.RED)
+                if has_cut_and_run:
+                    cool_print("Your Cut and Run program activates -- emergency jack-out!", fore_color=Fore.YELLOW)
+                    cool_print("You barely escape with your life. Your body is gone from the chair by the time they breach the door.")
+                    cool_print("Mission failed, but you live to run another day.")
+                else:
+                    cool_print("You feel a searing pain as your body is disconnected from the real world.")
+                    cool_print("The kill team found your meat. Game over.")
+                play = False
+                continue
+            elif trace_turns_left <= 3:
+                cool_print(f"TRACE WARNING: {trace_turns_left} turns remaining!", fore_color=Fore.RED)
+
         if _state._state['player']['health'] <= 0:
             cool_print(f"Your character {_state._state['player']['name']} is dead.")
             if _state._state['player']['health'] < -9:
@@ -78,6 +109,11 @@ def main():
                     })
                 
                 wander = 4
+                slowed = _state._state['player'].get('slowed', 0)
+                if slowed > 0:
+                    wander = max(1, wander - slowed)
+                    cool_print(f"You are slowed! Your movements are reduced to {wander} (normally 4).", fore_color=Fore.RED)
+                    cool_print("")
 
                 cool_print("To cross the path you must align the symbols either horizontally or vertially so they form continous lines:", state=_state)
                 cool_print("")

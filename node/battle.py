@@ -80,6 +80,13 @@ def battle(player, opponent, state):
         player_initiative = random.randint(1, 100)
         opponent_initiative = opponent['initiative']()
 
+        # Watchdog assist: +15 initiative for opponent
+        watch_dogged = player.get('watch_dogged', False)
+        if watch_dogged:
+            opponent_initiative += 15
+            cool_print("The Watchdog program assists your opponent!", fore_color=Fore.RED)
+            cool_print(f"{opponent['name']} gains +15 initiative from the Watchdog.")
+
         cool_print("Player Initiative: ", player_initiative, f', {opponent["name"]} Initiative: ', opponent_initiative)
 
         if player_initiative > opponent_initiative:
@@ -88,6 +95,16 @@ def battle(player, opponent, state):
         else:
             cool_print(f"{opponent['name']} has the initiative.")
             cool_print("You attack second.")
+
+        # Watchdog assist: 10% chance of a free opening attack
+        if watch_dogged and random.random() < 0.1:
+            cool_print("")
+            cool_print("The Watchdog lunges at you, giving the ICE an opening!", fore_color=Fore.RED)
+            action = random.choice(opponent['actions'])
+            if action['type'] == 'damage':
+                damage = action['roll']()
+                cool_print(f"Watchdog-assisted strike deals {damage} bonus damage!")
+                player['health'] -= damage
 
         # Track ongoing residual damage effects: list of (damage_per_turn, turns_remaining, source_name)
         residual_effects = []
@@ -138,6 +155,10 @@ def battle(player, opponent, state):
                 damage = action['roll']()
                 cool_print(f"The {opponent['name']} deals " + str(damage) + " damage to you.")
                 player['health'] -= damage
+
+                # Handle on-hit effects (e.g., Raven's program destruction)
+                if 'on_hit' in action:
+                    action['on_hit'](state)
 
                 # Handle residual damage (e.g., Hellhound's burn, Payload Injection)
                 if 'residual' in action:

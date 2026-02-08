@@ -202,7 +202,7 @@ def tracer_action(_state):
         cool_print("The Tracer program successfully locates your physical location.")
         cool_print("You must deal with the consequences in the physical world. But for now you have cleared this node and can continue with your mission.")
         cool_print("")
-        _state.logged()
+        _state.tracered()
         _state.complete_node()
         cool_print("Press any key to continue.")
         input()
