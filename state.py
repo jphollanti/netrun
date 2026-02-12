@@ -1,7 +1,8 @@
 import os
+import tempfile
 import levelgen
 import json
-import player 
+import player
 from cool_print import cool_print
 from cool_print import fixed_time_linear_speed_up_provider
 from colorama import Fore
@@ -10,64 +11,6 @@ import time
 WIDTH = 10
 HEIGHT = 10
 WAYPOINTS = 3
-
-# state template
-state = {
-    'player': {
-        'health': 50,
-        'deck': [
-            ''
-        ],
-    },
-    'route': [{
-        'node': {
-            'label': 'S',
-            'type': 'Jack-In',
-            'location': [0, 0],
-        },
-        'next': {
-            'label': '1',
-            'type': 'Black ICE',
-            'location': [0, 0],
-        },
-        'completed': {
-            'node': False,
-            'path': False,
-        },
-        'path': [
-            {
-                "location": [
-                    3,
-                    8
-                ],
-                "direction": [
-                    -1,
-                    0
-                ]
-            },
-            {
-                "location": [
-                    2,
-                    8
-                ],
-                "direction": [
-                    0,
-                    -1
-                ]
-            },
-            {
-                "location": [
-                    2,
-                    7
-                ],
-                "direction": [
-                    0,
-                    -1
-                ]
-            }
-        ]
-    }]
-}
 
 
 class MainState:
@@ -78,7 +21,19 @@ class MainState:
         if cls._instance is None:
             cls._instance = super().__new__(cls)  # Create a new instance
         return cls._instance
-    
+
+    @property
+    def player(self):
+        return self._state['player']
+
+    @property
+    def route(self):
+        return self._state['route']
+
+    @property
+    def jacked_out(self):
+        return self._state.get('jacked_out', False)
+
     def initialize(self):
         # check if state file exists
         fn = "state.json"
@@ -92,10 +47,10 @@ class MainState:
         else:
             cool_print("Creating new game and character")
             cool_print("Enter your character name: ", fore_color=Fore.YELLOW)
-            name = None
-            while not name and name != "":
-                name = input()
-                if name == "":
+            name = ""
+            while not name:
+                name = input().strip()
+                if not name:
                     cool_print("Name cannot be empty. Enter your character name: ", fore_color=Fore.YELLOW)
             route = levelgen.generate_new_state(WIDTH, HEIGHT, WAYPOINTS)
             _player = player.new_player(name)
@@ -105,25 +60,31 @@ class MainState:
             }
 
             self.store()
-    
+
     def delete_state(self):
         os.remove("state.json")
 
     def change_health(self, amount):
         self._state['player']['health'] += amount
         self.store()
-    
+
     def stun(self):
         self._state['player']['stunned'] = 1
         self.store()
-    
+
     def unstun(self):
         self._state['player']['stunned'] = 0
         self.store()
 
     def store(self):
-        with open("state.json", "w") as f:
-            json.dump(self._state, f)
+        fd, tmp_path = tempfile.mkstemp(dir=".", suffix=".tmp")
+        try:
+            with os.fdopen(fd, "w") as f:
+                json.dump(self._state, f)
+            os.replace(tmp_path, "state.json")
+        except:
+            os.unlink(tmp_path)
+            raise
 
     def complete_node(self):
         rloc = levelgen.get_current_route_loc(self._state['route'])
@@ -134,7 +95,7 @@ class MainState:
         rloc = levelgen.get_current_route_loc(self._state['route'])
         rloc['completed']['path'] = True
         self.store()
-    
+
     def logged(self):
         self._state['player']['logged'] = True
         self.store()
@@ -163,11 +124,16 @@ class MainState:
         self.store()
         cool_print("All your programs have been destroyed!")
 
-    def complete_mission(self, success):
-        rloc = levelgen.get_current_route_loc(self._state['route'])
-        rloc['completed']['node'] = True
-        rloc['completed']['path'] = True
+    def jack_out(self):
+        self._state['jacked_out'] = True
         self.store()
+
+    def set_mission_result(self, success):
+        self._state['mission_success'] = success
+        self.store()
+
+    def complete_mission(self):
+        success = self._state.get('mission_success', True)
         cool_print("Mission complete!")
         if success:
             if self._state['player'].get('logged', False):

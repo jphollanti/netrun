@@ -1,5 +1,5 @@
 import levelgen
-from node import node
+import node
 import time
 import state
 import n_in_row
@@ -16,10 +16,10 @@ def main():
     trace_turns_left = None
     while play:
         # Check for death first
-        if _state._state['player']['health'] <= 0:
-            cool_print(f"Your character {_state._state['player']['name']} is dead.")
-            if _state._state['player']['health'] < -9:
-                cool_print(f"Like really, really dead (health = {_state._state['player']['health']}).")
+        if _state.player['health'] <= 0:
+            cool_print(f"Your character {_state.player['name']} is dead.")
+            if _state.player['health'] < -9:
+                cool_print(f"Like really, really dead (health = {_state.player['health']}).")
             cool_print(f"Game over man. Game over. ")
             time.sleep(1)
             cool_print(f"So sad, sigh.")
@@ -30,14 +30,15 @@ def main():
             cool_print(f"...")
             cool_print(f"")
             time.sleep(.5)
-            cool_print(f"R.I.P. {_state._state['player']['name']}.")
+            cool_print(f"R.I.P. {_state.player['name']}.")
             cool_print(f"")
             time.sleep(2)
             cool_print("Anyhoo! Start a new game? (y/n): ", fore_color=Fore.YELLOW)
             choice = input()
             if choice == 'y':
                 _state.delete_state()
-                _state._instance = None
+                state.MainState._instance = None
+                state.MainState._state = None
                 _state = state.MainState()
                 _state.initialize()
                 trace_turns_left = None
@@ -46,8 +47,14 @@ def main():
                 play = False
                 continue
 
+        # Check for jack-out
+        if _state.jacked_out:
+            cool_print("You have jacked out of the system.")
+            play = False
+            continue
+
         # Traced countdown: detect new trace
-        if trace_turns_left is None and _state._state['player'].get('traced', False):
+        if trace_turns_left is None and _state.player.get('traced', False):
             trace_turns_left = TRACE_COUNTDOWN + 1  # +1 because we decrement below before first turn
             cool_print("")
             cool_print("WARNING: A kill team has been dispatched to your physical location.", fore_color=Fore.RED)
@@ -58,7 +65,7 @@ def main():
         if trace_turns_left is not None:
             trace_turns_left -= 1
             if trace_turns_left <= 0:
-                deck = _state._state['player'].get('deck', [])
+                deck = _state.player.get('deck', [])
                 has_cut_and_run = any(c.get('id') == 'cut_and_run' for c in deck)
                 cool_print("")
                 cool_print("Time's up. The kill team has arrived at your physical location.", fore_color=Fore.RED)
@@ -75,22 +82,24 @@ def main():
                 cool_print(f"TRACE WARNING: {trace_turns_left} turns remaining!", fore_color=Fore.RED)
 
         # Check for win condition
-        rloc = levelgen.get_current_route_loc(_state._state['route'])
+        rloc = levelgen.get_current_route_loc(_state.route)
         if rloc is None:
-            _state.complete_mission(True)
+            _state.complete_mission()
             play = False
             continue
 
         # Show map and location
         cool_print("Progress: ", state=_state)
         print("")
-        levelgen.visualize(state.WIDTH, state.HEIGHT, _state._state['route'], rloc['node']['location'], state=_state)
+        levelgen.visualize(state.WIDTH, state.HEIGHT, _state.route, rloc['node']['location'], state=_state)
         cool_print("You are at location: ", rloc['node']['location'], state=_state)
         cool_print("")
 
         if not rloc['completed']['node']:
             n = node.generate_node(rloc['node']['type'])
             n(_state)
+            if _state.jacked_out or _state.player['health'] <= 0:
+                continue
         elif not rloc['completed']['path']:
             # Last route entry (end node) has next=None, path is empty -- auto-complete it
             if not rloc['path']:
@@ -118,6 +127,9 @@ def main():
                     _state.complete_path()
                     continue
 
+                # Limit to 2 sections (one per available symbol)
+                sections = sections[:2]
+
                 width = 10
                 height = 10
 
@@ -130,13 +142,13 @@ def main():
                     })
 
                 wander = 4
-                slowed = _state._state['player'].get('slowed', 0)
+                slowed = _state.player.get('slowed', 0)
                 if slowed > 0:
                     wander = max(1, wander - slowed)
                     cool_print(f"You are slowed! Your movements are reduced to {wander} (normally 4).", fore_color=Fore.RED)
                     cool_print("")
 
-                cool_print("To cross the path you must align the symbols either horizontally or vertially so they form continous lines:", state=_state)
+                cool_print("To cross the path you must align the symbols either horizontally or vertically so they form continuous lines:", state=_state)
                 cool_print("")
                 for p in pieces:
                     example = p['symbol'] * p['length']

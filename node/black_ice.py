@@ -301,6 +301,6 @@ def black_ice(_state):
     cool_print("You arrive at a node. Steam hisses in the empty virtual space as intrusion countermeasures begin to activate.")
     cool_print("")
 
-    ice = random.choice(black_ice_programs)
+    ice = {**random.choice(black_ice_programs)}
 
-    battle.battle(_state._state['player'], ice, _state)
+    battle.battle(_state.player, ice, _state)

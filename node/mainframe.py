@@ -422,12 +422,14 @@ def mainframe(_state):
             cool_print(f"Entry with {custom_entry['username']} found in access log file.", state=_state)
             cool_print("Mission failed!", state=_state)
             if _state:
-                _state.complete_mission(False)
+                _state.set_mission_result(False)
+                _state.complete_node()
         else:
             cool_print(f"Entry with {custom_entry['username']} not found in access log file.", state=_state)
             cool_print("Good job! Mission accomplished!", state=_state)
             if _state:
-                _state.complete_mission(True)
+                _state.set_mission_result(True)
+                _state.complete_node()
     else:
         cool_print("Access log file no longer present in mainframe.", state=_state)
         cool_print("Unfortunately, you removed the whole access log file. ", state=_state)
@@ -435,7 +437,8 @@ def mainframe(_state):
         cool_print("They will find out the original file and it's contents.", state=_state)
         cool_print("Mission failed!", state=_state)
         if _state:
-            _state.complete_mission(False)
+            _state.set_mission_result(False)
+            _state.complete_node()
 
 if __name__ == "__main__":
 

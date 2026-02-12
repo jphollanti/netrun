@@ -153,6 +153,9 @@ def min_delay_provider(x, y):
     return [0.003, 0.01, 0.0003, 0.001]
 
 
+# NOTE: row_delay_provider has the same values as min_delay_provider but serves
+# as a sentinel — cool_print uses identity comparison (== row_delay_provider) to
+# trigger an instant-print fast path. Do not merge these two functions.
 def row_delay_provider(x, y):
     return [0.003, 0.01, 0.0003, 0.001]
 
@@ -233,7 +236,7 @@ def cool_print(
     garbled = []
     if state:
         # based on health, garble up the text
-        health = state._state['player']['health']
+        health = state.player['health']
         randomize = 0
         if health < 20:
             randomize = .01
@@ -363,7 +366,7 @@ def cool_print(
                 event = heapq.heappop(event_queue)
                 event.action()
             # Sleep for a short duration to prevent high CPU usage
-            time.sleep(0.001)  # 10ms
+            time.sleep(0.001)  # 1ms
     
     if hide_cursor:
         file.write(SHOW_CURSOR)

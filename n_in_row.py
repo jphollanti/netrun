@@ -308,21 +308,33 @@ def prompt_and_swap(board):
     """
     Ask the user for two sets of coordinates (x1, y1) and (x2, y2),
     then call swap_cells to swap those positions on the board.
+    Returns True if the swap was performed, False on invalid input.
     """
-    # 1) Prompt user for the first cell (x1, y1)
-    cool_print("Enter coordinates of the first cell (x1 y1):", delay_provider=min_delay_provider)
-    inp = input()
-    x1_str, y1_str = inp.split()
-    x1, y1 = int(x1_str), int(y1_str)
+    try:
+        # 1) Prompt user for the first cell (x1, y1)
+        cool_print("Enter coordinates of the first cell (x1 y1):", delay_provider=min_delay_provider)
+        inp = input()
+        parts = inp.split()
+        if len(parts) != 2:
+            cool_print("Invalid input. Enter two numbers separated by a space.")
+            return False
+        x1, y1 = int(parts[0]), int(parts[1])
 
-    # 2) Prompt user for the second cell (x2, y2)
-    cool_print("Enter coordinates of the second cell (x2 y2):", delay_provider=min_delay_provider)
-    inp = input()
-    x2_str, y2_str = inp.split()
-    x2, y2 = int(x2_str), int(y2_str)
+        # 2) Prompt user for the second cell (x2, y2)
+        cool_print("Enter coordinates of the second cell (x2 y2):", delay_provider=min_delay_provider)
+        inp = input()
+        parts = inp.split()
+        if len(parts) != 2:
+            cool_print("Invalid input. Enter two numbers separated by a space.")
+            return False
+        x2, y2 = int(parts[0]), int(parts[1])
 
-    # 3) Call your swap function (make sure to import or include swap_cells)
-    swap_cells(board, (x1, y1), (x2, y2))
+        # 3) Call your swap function
+        swap_cells(board, (x1, y1), (x2, y2))
+        return True
+    except ValueError:
+        cool_print("Invalid input. Coordinates must be numbers.")
+        return False
 
 
 def play_game(width, height, pieces, wander, state=None):
@@ -336,17 +348,15 @@ def play_game(width, height, pieces, wander, state=None):
     while wander > 0:
         cool_print(f"Moves left: {wander}")
         # Pick two cells to swap
-        prompt_and_swap(board)
+        if not prompt_and_swap(board):
+            continue
 
-        highlights = find_patterns(board, pieces)
+        wander -= 1
+
+        highlights, found = find_patterns(board, pieces)
         cool_print("Board to solve:", state=state)
         print_board(board, highlights, state=state)
 
-        wander -= 1
-    
-        highlights, found = find_patterns(board, pieces)
-        # check if highlights equals pieces
-        #print("highlights", highlights, "found", found, "pieces", len(pieces), "pieces", pieces)
         if found == len(pieces):
             cool_print("You won!")
             return True
