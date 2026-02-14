@@ -4,7 +4,7 @@ from cool_print import cool_print
 
 
 def jack_in(_state):
-    cool_print("You are at the Jack-In point. You must make a choice:")
+    cool_print("You are at the Jack-In point.")
     cool_print("1. Jack-In")
     cool_print("2. Leave")
     cool_print("Enter your choice: ", fore_color=Fore.YELLOW)

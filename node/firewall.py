@@ -3,7 +3,7 @@ from colorama import Fore
 from cool_print import cool_print
 
 def firewall(_state): 
-    cool_print("You encounter a corporate Firewall. You must make a choice:", new_line_after_print=True)
+    cool_print("You encounter a corporate Firewall.", new_line_after_print=True)
     cool_print("1. Attempt to hack the firewall")
     cool_print("2. Fleee.... eeeee.... eeeee....")
 
