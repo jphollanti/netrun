@@ -3,3 +3,4 @@ __pycache__
 trash
 .DS_Store
 *.code-workspace
+venv

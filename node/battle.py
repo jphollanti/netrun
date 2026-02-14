@@ -63,7 +63,7 @@ def battle(player, opponent, state):
 
     cool_print("")
 
-    cool_print("You must make a choice:")
+    cool_print("")
     cool_print(f"1. Face the {opponent['name']}.")
     cool_print("2. Jack-out and escape. Continue to fight another day.")
 
