@@ -377,8 +377,10 @@ def data_core(state):
                 tries -= 1
                 if tries == 0:
                     print(f"{DATA_CORE_COLOR}Out of tries. Game over.")
-                    state.complete_mission(False)
-                    return -1
+                    if state:
+                        state.set_mission_result(False)
+                        state.complete_node()
+                    return
                 message = f"{DATA_CORE_COLOR}Key is incorrect! Try again. Tries remaining: {tries}."
         # else: do nothing for other keys
     
@@ -404,10 +406,14 @@ def data_core(state):
     try_key = input("> ")
     if try_key.strip() == key:
         cool_print("You have successfully extracted the data!", delay_provider=min_delay_provider, state=state)
-        state.complete_mission(True)
+        if state:
+            state.set_mission_result(True)
+            state.complete_node()
     else:
         cool_print("The key is incorrect. Mission failed.", delay_provider=min_delay_provider, state=state)
-        state.complete_mission(False)
+        if state:
+            state.set_mission_result(False)
+            state.complete_node()
 
 
 def main():

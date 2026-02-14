@@ -4,30 +4,30 @@ from enum import Enum, auto
 from cool_print import cool_print
 
 
-# 
+#
 # Logic:
-# 
+#
 # Player and opponent have actions that they play on their turn. Player has a deck of additional
-# actions. 
-# 
+# actions.
+#
 # Player and opponent have health. Player and opponent have initiative.
 #
-# When an action is taken against a player or opponent, the action will be added to 
-# the effects log. The effects log is processed in order when it's player's turn. 
-# 
-# Some actions need to be immediate, like damage. 
+# When an action is taken against a player or opponent, the action will be added to
+# the effects log. The effects log is processed in order when it's player's turn.
+#
+# Some actions need to be immediate, like damage.
 #
 # All actions need to have a type because some actions can be counteracted by other actions.
 #
 # For example, if a player is struck by a worm, they can use an antivirus action to remove the worm.
-# The end result is that the effect of the worm is nullified. 
-# 
+# The end result is that the effect of the worm is nullified.
+#
 # The effect log is ordered based on turns. For example, if a player is struck by an action
-# that causes damage over time, the effect will be added to the effect log and processed on 
+# that causes damage over time, the effect will be added to the effect log and processed on
 # the player's turn.
 #
 # If the action is stun instead of damage, the player will lose their next turn.
-# 
+#
 
 class ActionType(Enum):
     DAMAGE = auto()
@@ -73,7 +73,8 @@ def battle(player, opponent, state):
     if choice == '2':
         cool_print(f"You escape just in time to evade the {opponent['name']}.")
         cool_print("You live to fight another day.")
-        exit()
+        state.jack_out()
+        return
     elif choice == '1':
         cool_print("You have chosen to face the enemy.")
 
@@ -192,42 +193,16 @@ def battle(player, opponent, state):
                     cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
                     input()
 
-            elif action['type'] == 'debuff':
+            elif action['type'] in ('debuff', 'buff', 'defensive', 'utility'):
                 cool_print(f"{opponent['name']} uses {action['name']}!")
                 if action.get('special'):
                     cool_print(f"Effect: {action['special']}")
                 cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
                 input()
-
-            elif action['type'] == 'buff':
-                cool_print(f"{opponent['name']} uses {action['name']}!")
-                if action.get('special'):
-                    cool_print(f"Effect: {action['special']}")
-                cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
-                input()
-
-            elif action['type'] == 'defensive':
-                cool_print(f"{opponent['name']} uses {action['name']}!")
-                if action.get('special'):
-                    cool_print(f"Effect: {action['special']}")
-                cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
-                input()
-
-            elif action['type'] == 'utility':
-                cool_print(f"{opponent['name']} uses {action['name']}!")
-                if action.get('special'):
-                    cool_print(f"Effect: {action['special']}")
-                cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
-                input()
-
-        def game_over(opponent):
-            cool_print(f"You are defeated by the {opponent['name']}.")
-            cool_print("Game Over.")
-            exit()
 
         while True:
             if player['health'] <= 0:
-                game_over(opponent)
+                break
             if opponent['health'] <= 0:
                 break
 
@@ -235,7 +210,7 @@ def battle(player, opponent, state):
             if residual_effects:
                 apply_residual_damage(player)
                 if player['health'] <= 0:
-                    game_over(opponent)
+                    break
 
             cool_print("Player Health: ", player['health'])
             cool_print(opponent['name'] + " Health: ", opponent['health'])
@@ -248,10 +223,13 @@ def battle(player, opponent, state):
             else:
                 opponent_turn(player, opponent)
                 if player['health'] <= 0:
-                    game_over(opponent)
+                    break
                 player_turn(player, opponent)
 
+    if player['health'] <= 0:
+        cool_print(f"You are defeated by the {opponent['name']}.")
+        state.store()
+        return
 
     cool_print(f"You defeated the {opponent['name']}. This node is now secure and you can continue your mission.")
     state.complete_node()
-            

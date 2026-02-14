@@ -218,7 +218,7 @@ def white_ice(_state):
 
     # Netwatch Scout uses the battle system; all others use direct action handlers
     if 'actions' in ice:
-        battle.battle(_state._state['player'], ice, _state)
+        battle.battle(_state.player, {**ice}, _state)
     else:
         cool_print(f"You encounter a {ice['name']}.")
         cool_print(ice['effect'])

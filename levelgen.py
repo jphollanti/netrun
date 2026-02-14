@@ -1,7 +1,7 @@
 import random
 import json
 from colorama import Fore, Back, Style, init
-import node.node as node
+from node import node_types, end_node_types
 from cool_print import cool_print
 from cool_print import linear_speed_up_delay_provider
 from cool_print import min_delay_provider
@@ -157,7 +157,7 @@ def generate_new_state(width, height, waypoints_number):
     
     end = {
         'label': 'E',
-        'type': random.choice(node.end_node_types),
+        'type': random.choice(end_node_types),
         'location': None
     }
     while near(start, end):
@@ -170,7 +170,7 @@ def generate_new_state(width, height, waypoints_number):
     for i in range(waypoints_number):
         wp = {
             'label': str(i),
-            'type': random.choice(node.node_types),
+            'type': random.choice(node_types),
             'location': get_random_position(width, height)
         }
         while near_any(nodes, wp) or near(start, wp) or near(end, wp):
@@ -256,7 +256,7 @@ def get_sections_of_path(path):
         elif step['direction'] != direction:
             sections.append(count)
             direction = step['direction']
-            count = 0
+            count = 1
 
     if count > 0:
         sections.append(count)

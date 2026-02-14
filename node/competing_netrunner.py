@@ -154,7 +154,7 @@ def competing_netrunner(_state):
         cool_print(f"You send one of your program's back to {himher}.")
         cool_print("Another netrunner protocol. If you part as friends, share your programs.")
         cool_print("This way, if either of you rat the other one out,")
-        cool_print("the other one is carrying a program with past posession linking back to the other.")
+        cool_print("the other one is carrying a program with past possession linking back to the other.")
         cool_print("Makes it that much harder to turn the other one in.")
         _state.receive_program()
         _state.lose_program()
@@ -166,7 +166,7 @@ def competing_netrunner(_state):
         cool_print("Press any key to continue.", fore_color=Fore.YELLOW)
         input()
         cool_print("")
-        battle.battle(_state._state['player'], netrunner, _state)
+        battle.battle(_state.player, {**netrunner}, _state)
         
         cool_print("Press any key to continue.")
         input()
